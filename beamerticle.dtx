@@ -1,0 +1,437 @@
+% \iffalse meta-comment
+%<*internal>
+\iffalse
+%</internal>
+%<*readme>
+# beamerticle: Convenient mode selection in Beamer documents
+
+This class is a wrapper around the `beamer` class to make it easier to use the
+same document to generate the different forms of the presentation: the slides
+themselves, an abbreviated slide set for transparencies or online reference,
+an n-up handout version, but most significantly a transcript or set of notes
+using the `article` class.
+
+## Installation
+
+### Dependencies
+
+TBC
+
+### Automated way
+
+A makefile is provided which you can use with the Make utility:
+
+  * Running `make` generates the derived files
+  * Running `make inst` installs the files in the user's TeX tree.
+  * Running `make install` installs the files in the local TeX tree.
+
+## Licence
+
+This work consists of the file dcchowto.dtx and a Makefile.
+
+This work may be distributed and/or modified under the conditions of the
+[LaTeX Project Public License (LPPL)](http://www.latex-project.org/lppl.txt),
+either version 1.3c of this license or (at your option) any later version.
+
+This work is "maintained" (as per LPPL maintenance status) by
+[Alex Ball](http://alexball.me.uk/).
+
+%</readme>
+%<nothing>Verbatim files go here
+%<*internal>
+\fi
+\def\nameofplainTeX{plain}
+\ifx\fmtname\nameofplainTeX\else
+  \expandafter\begingroup
+\fi
+%</internal>
+%<*install>
+\input docstrip.tex
+\keepsilent
+\askforoverwritefalse
+\preamble
+----------------------------------------------------------------
+beamerticle --- Convenient mode selection in Beamer documents
+Author:  Alex Ball
+E-mail:  a.ball@ukoln.ac.uk
+License: Released under the LaTeX Project Public License v1.3c or later
+See:     http://www.latex-project.org/lppl.txt
+----------------------------------------------------------------
+
+\endpreamble
+\postamble
+
+Copyright (C) 2015 by Alex Ball <a.ball@ukoln.ac.uk>
+\endpostamble
+
+\usedir{tex/latex/\jobname}
+\generate{
+  \file{\jobname.cls}{\from{\jobname.dtx}{class}}
+}
+%</install>
+%<install>\endbatchfile
+%<*internal>
+\usedir{source/latex/\jobname}
+\generate{
+  \file{\jobname.ins}{\from{\jobname.dtx}{install}}
+}
+\nopreamble\nopostamble
+\usedir{doc/latex/\jobname}
+\generate{
+  \file{README.md}{\from{\jobname.dtx}{readme}}
+}
+\ifx\fmtname\nameofplainTeX
+  \expandafter\endbatchfile
+\else
+  \expandafter\endgroup
+\fi
+%</internal>
+%<*driver>
+\ProvidesFile{beamerticle.dtx}
+%</driver>
+%<class>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
+%<class>\ProvidesClass{beamerticle}
+%<*class>
+    [2016/07/12 v0.1 Convenient mode selection in Beamer documents ]
+%</class>
+%<*driver>
+\documentclass[12pt]{article}
+% Page Layout
+\usepackage[a4paper,hmargin=30mm,vmargin=25mm,nohead]{geometry}
+% Typography
+\RequirePackage[charter,expert]{mathdesign}
+\makeatletter
+\def\hrulefill{\leavevmode\leaders \hrule height \rulethickness \hfill\kern\z@}
+\makeatother
+\RequirePackage{iftex}
+\ifPDFTeX
+  \RequirePackage[utf8]{inputenc}
+  \RequirePackage[T1]{fontenc}
+  \RequirePackage[scaled=0.96,sups]{XCharter}
+  \RequirePackage[scaled=0.95,tabular]{sourcesanspro}
+  \RequirePackage[varl,varqu]{zi4}
+\else
+  \RequirePackage{fontspec}
+  \setmainfont
+    [Scale=0.96
+    ,Ligatures=TeX
+    ]%
+    {Charis SIL}
+  \setsansfont
+    [Scale=MatchLowercase
+    ,Ligatures=TeX
+    ,StylisticSet=4
+    ,BoldFont={Source Sans Pro Bold}
+    ,ItalicFont={Source Sans Pro Italic}
+    ,BoldItalicFont={Source Sans Pro Bold Italic}
+    ]%
+    {Source Sans Pro}
+  \setmonofont
+    [Scale=MatchLowercase
+    ,RawFeature={extend=0.83}
+    ,BoldFont={Source Code Pro Bold}
+    ,BoldItalicFont={Source Code Pro Bold}
+    ,AutoFakeSlant=0.2
+    ,ItalicFeatures={StylisticSet=2,StylisticSet=3}
+    ,BoldItalicFeatures={FakeSlant=0.2,StylisticSet=2,StylisticSet=3}
+    ]%
+    {Source Code Pro}
+\fi
+% Improving the look of the documentation
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+\usepackage{enumitem}
+\setlist[itemize]{%
+  topsep={6pt plus 2pt minus 1pt},%
+  partopsep={0pt plus 0.05em},%
+  itemsep={0.2em plus 0.05em minus 0.05em},%
+  parsep={0pt plus 0.05em},%
+}
+\usepackage[bookmarks,raiselinks,pageanchor,hyperindex,colorlinks]{hyperref}
+\usepackage{tcolorbox,doc}
+\makeatletter
+\renewenvironment{theglossary}{%
+  \bgroup
+    \glossary@prologue
+    \GlossaryParms \let\item\@idxitem \ignorespaces
+}{%
+  \egroup
+}
+\makeatother
+\tcbuselibrary{documentation,breakable,minted}
+\colorlet{Option}{violet}
+\colorlet{Command}{red!75!black}
+\colorlet{Environment}{blue!75!black}
+\colorlet{Value}{olive!75!black}
+\colorlet{Color}{cyan!75!black}
+\tcbset
+  { listing engine=minted
+  , minted options={breaklines,fontsize=\small,linenos,numbersep=20pt,firstnumber=last}
+  , index format=pgf
+  , color command=Command
+  , color environment=Environment
+  , color key=Option
+  , color value=Value
+  , color color=Color
+  }
+\renewcommand{\theFancyVerbLine}{\footnotesize\itshape\color{gray}\arabic{FancyVerbLine}}
+\let\tcbcs=\cs
+\renewcommand*{\cs}[1]{\textcolor{Command}{\tcbcs{#1}}}
+\def\sqbrackets#1{%
+  \texttt{\textcolor{Option}{[}#1\textcolor{Option}{]}}}
+\def\brackets#1{%
+  \texttt{\textcolor{Environment}{\char`\{}#1\textcolor{Environment}{\char`\}}}}
+\def\marg#1{%
+  \textcolor{Environment}{\ttfamily\char`\{}\meta{#1}\textcolor{Environment}{\ttfamily\char`\}}}
+\newcommand*{\env}[1]{\textcolor{Environment}{\ttfamily #1}}
+\newcommand*{\key}[1]{\textcolor{Option}{\ttfamily #1}}
+\newcommand*{\val}[1]{\textcolor{Value}{\ttfamily #1}}
+\renewenvironment{macro}[1]{%
+  \def\MyName{#1}%
+  \index{\MyName@\tcbIndexPrintComC {\MyName}|(emph}%
+}{%
+  \ifdef{\MyName}{}{%
+    \errmessage{You have closed a macro environment you have not opened on \the\inputlineno.}%
+  }
+  \index{\MyName@\tcbIndexPrintComC {\MyName}|)}%
+}
+\renewenvironment{environment}[1]{%
+  \def\MyName{#1}%
+  \index{\MyName@\tcbIndexPrintEnvCA {\MyName}|(emph}%
+  \index{Environments!\MyName@\tcbIndexPrintEnvC {\MyName}|(emph}%
+}{%
+  \ifdef{\MyName}{}{%
+    \errmessage{You have closed an environment environment you have not opened on \the\inputlineno.}%
+  }
+  \index{Environments!\MyName@\tcbIndexPrintEnvC {\MyName}|)}%
+  \index{\MyName@\tcbIndexPrintEnvCA {\MyName}|)}%
+}
+\newenvironment{optionkey}[1]{%
+  \def\MyName{#1}%
+  \index{\MyName@\tcbIndexPrintKeyCA {\MyName}|(emph}%
+  \index{Keys!\MyName@\tcbIndexPrintKeyC {\MyName}|(emph}%
+}{%
+  \ifdef{\MyName}{}{%
+    \errmessage{You have closed an optionkey environment you have not opened on \the\inputlineno.}%
+  }
+  \index{Keys!\MyName@\tcbIndexPrintKeyC {\MyName}|)}%
+  \index{\MyName@\tcbIndexPrintKeyCA {\MyName}|)}%
+}
+\newenvironment{optionvalue}[1]{%
+  \def\MyName{#1}%
+  \index{\MyName@\tcbIndexPrintValCA {\MyName}|(emph}%
+  \index{Values!\MyName@\tcbIndexPrintValC {\MyName}|(emph}%
+}{%
+  \ifdef{\MyName}{}{%
+    \errmessage{You have closed an optionvalue environment you have not opened on \the\inputlineno.}%
+  }
+  \index{Values!\MyName@\tcbIndexPrintValC {\MyName}|)}%
+  \index{\MyName@\tcbIndexPrintValCA {\MyName}|)}%
+}
+\makeatletter
+\AtBeginDocument{%
+  % Comments
+  \expandafter\def\csname PYGdefault@tok@c\endcsname{\let\PYGdefault@it=\textit\def\PYGdefault@tc##1{\textcolor{gray}{##1}}}
+  % Command sequences
+  \expandafter\def\csname PYGdefault@tok@k\endcsname{\def\PYGdefault@tc##1{\textcolor{Command}{##1}}}
+  % Optional arguments
+  \expandafter\def\csname PYGdefault@tok@na\endcsname{\def\PYGdefault@tc##1{\textcolor{Option}{##1}}}
+  % Braces
+  \expandafter\def\csname PYGdefault@tok@nb\endcsname{\def\PYGdefault@tc##1{\textcolor{Environment}{##1}}}
+}
+\makeatother
+\newcommand{\pkg}[1]{\href{http://www.ctan.org/pkg/#1}{\textsf{#1}}}
+\MakeShortVerb{\|}
+\makeatletter
+\let\PrintMacroName\@gobble
+\let\PrintEnvName\@gobble
+\renewenvironment{tcb@manual@entry}{\begin{list}{}{%
+  \setlength{\topsep}{0pt}
+  \setlength{\partopsep}{0pt}
+  \setlength{\leftmargin}{\kvtcb@doc@left}%
+  \setlength{\itemindent}{0pt}%
+  \setlength{\itemsep}{0pt}%
+  \setlength{\parsep}{0pt}%
+  \setlength{\rightmargin}{\kvtcb@doc@right}%
+  }\item}{\end{list}}
+\makeatother
+% This bit inspired by ydoc
+\makeatletter
+\newwrite\ydocwrite
+\def\ydocfname{\jobname.cod}
+\def\ydoc@catcodes{%
+  \let\do\@makeother
+  \dospecials
+  \catcode`\\=\active
+  \catcode`\^^M=\active
+  \catcode`\ =\active
+}
+\def\macrocode{%
+  \begingroup
+  \ydoc@catcodes
+  \macro@code
+}
+\def\endmacrocode{}
+\begingroup
+\endlinechar\m@ne
+\@firstofone{%
+\catcode`\|=0\relax
+\catcode`\(=1\relax
+\catcode`\)=2\relax
+\catcode`\*=14\relax
+\catcode`\{=12\relax
+\catcode`\}=12\relax
+\catcode`\ =12\relax
+\catcode`\%=12\relax
+\catcode`\\=\active
+\catcode`\^^M=\active
+\catcode`\ =\active
+}*
+|gdef|macro@code#1^^M%    \end{macrocode}(*
+|endgroup|expandafter|macro@@code|expandafter(|ydoc@removeline#1|noexpand|lastlinemacro)*
+)*
+|gdef|ydoc@removeline#1^^M(|noexpand|firstlinemacro)*
+|gdef|ydoc@defspecialmacros(*
+|def^^M(|noexpand|newlinemacro)*
+|def (|noexpand|spacemacro)*
+|def\(|noexpand|bslashmacro)*
+)*
+|gdef|ydoc@defrevspecialmacros(*
+|def|newlinemacro(|noexpand^^M)*
+|def|spacemacro(|noexpand )*
+|def|bslashmacro(|noexpand\)*
+)*
+|endgroup
+\def\macro@@code#1{%
+  {\ydoc@defspecialmacros
+  \xdef\themacrocode{#1}}%
+  \PrintMacroCode
+  \end{macrocode}%
+}
+\def\PrintMacroCode{%
+  \begingroup
+  \let\firstlinemacro\empty
+  \let\lastlinemacro\empty
+  \def\newlinemacro{^^J}%
+  \let\bslashmacro\bslash
+  \let\spacemacro\space
+  \immediate\openout\ydocwrite=\ydocfname\relax
+  \immediate\write\ydocwrite{\themacrocode}%
+  \immediate\closeout\ydocwrite
+  \let\input\@input
+  \tcbinputlisting{breakable,listing only,docexample,listing file=\ydocfname}%
+  \endgroup
+}
+\makeatother
+
+\DisableCrossrefs
+\makeindex
+%\CodelineIndex
+\RecordChanges
+\begin{document}
+
+\GetFileInfo{\jobname.dtx}
+\DoNotIndex{\documentclass,\newcommand,\newenvironment}
+
+\title{\textsf{beamerticle} --- A LaTeX class for DCC How-to Guides}
+\author{Alex Ball}
+\date{Class \fileversion\ --- \filedate}
+
+\maketitle
+
+\begin{abstract}\noindent
+This class is a wrapper around the \textsf{beamer} class to make it easier to use the
+same document to generate the different forms of the presentation: the slides
+themselves, an abbreviated slide set for transparencies or online reference,
+an n-up handout version, but most significantly a transcript or set of notes
+using the \textsf{article} class.
+
+To contact the author about this package, please visit the GitHub
+page where the code is hosted: \url{https://github.com/alex-ball/beamerticle}.
+\end{abstract}
+
+\section{Introduction}
+
+This class has three main functions:
+
+\begin{enumerate}
+\item
+  To make it easier, within the same document, to switch between using the
+  \textsf{beamer} class and the \textsf{article} class with the
+  \textsf{beamerarticle} package. This includes adding more of what
+  \textsf{beamer} does to the \textsf{article} class than does the 
+  \textsf{beamerarticle} package.
+\item
+  To offer more choices of handout-mode layouts than the \textsf{beamer} manual
+  gives you, and to make them easier to select.
+\item
+  To allow you to override the \textsf{beamer} mode from the command line, by
+  choosing a given jobname suffix. Primarily this is to allow you to generate
+  the different versions programmatically. Indeed, the class provides facilities
+  for generating multiple versions with a single command.
+\end{enumerate}
+
+\section{Usage}
+
+\subsection{Loading the class}
+
+The class is loaded in the usual way:
+
+\begin{tcolorbox}[docexample,fontupper=\small]
+\cs{documentclass}\oarg{options}\brackets{beamerticle}
+\end{tcolorbox}
+
+The following options are recognised:
+
+\begin{docKey}{nuphandout}{}{default \val{6}, initially unset}
+  Not implemented yet.
+\end{docKey}
+
+\subsection{Preamble}
+
+TBC
+
+\subsection{Body}
+
+TBC
+
+\StopEventually{^^A
+  \PrintChanges
+  \printindex
+}
+
+\section{Implementation}
+
+\DocInput{\jobname.dtx}
+\end{document}
+%</driver>
+% \fi
+% \iffalse
+%<*class>
+% \fi
+%
+% \subsection{Options}
+%
+% We use \pkg{xkeyval} for setting options.
+%
+%    \begin{macrocode}
+\RequirePackage{xkeyval}
+%    \end{macrocode}
+%
+% \begin{optionkey}{nuphandout}
+% The \key{nuphandout} option triggers handout mode.
+%
+%    \begin{macrocode}
+\define@choicekey{beamerticle}{nuphandout}{2,3,4,6}[6]{}
+%    \end{macrocode}
+% \end{optionkey}
+%
+% There is no more.
+%
+%    \begin{macrocode}
+\endinput
+%    \end{macrocode}
+% \iffalse
+%</class>
+% \fi
+%\Finale
