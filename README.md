@@ -22,7 +22,7 @@ A makefile is provided which you can use with the Make utility:
 
 ## Licence
 
-This work consists of the file dcchowto.dtx and a Makefile.
+This work consists of the file beamerticle.dtx and a Makefile.
 
 This work may be distributed and/or modified under the conditions of the
 [LaTeX Project Public License (LPPL)](http://www.latex-project.org/lppl.txt),
