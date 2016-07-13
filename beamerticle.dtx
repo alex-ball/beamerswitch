@@ -442,6 +442,10 @@ TBC
 
 TBC
 
+\begin{dispListing}
+  \newcommand{\ArticleSuffix}{-script}
+\end{dispListing}
+
 \StopEventually{^^A
   \PrintChanges
   \printindex
@@ -449,6 +453,7 @@ TBC
 
 \section{Implementation}
 
+\setcounter{FancyVerbLine}{18}%
 \DocInput{\jobname.dtx}
 \end{document}
 %</driver>
@@ -457,22 +462,217 @@ TBC
 %<*class>
 % \fi
 %
-% \subsection{Options}
+% \subsection{Dependencies}
 %
-% We use \pkg{xkeyval} for setting options.
+% We use the following packages:
+% \begin{itemize}
+% \item
+%   \pkg{xkeyval} for setting options
+% \item
+%   \pkg{etoolbox} for list processing
+% \item
+%   \pkg{xstring} for comparisons
+% \item
+%   \pkg{shellesc} for running extra modes
+% \item
+%   \pkg{iftex} for determining which engine to use
+% \end{itemize}
 %
 %    \begin{macrocode}
-\RequirePackage{xkeyval}
+\RequirePackage{xkeyval,etoolbox,xstring,shellesc,iftex}
 %    \end{macrocode}
 %
-% \begin{optionkey}{nuphandout}
-% The \key{nuphandout} option triggers handout mode.
+% \subsection{Options}
+%
+% We recognize four main modes of operation: `beamer', `trans', `handout' (with
+% a given number of slides per page) and `article'.
+%
+% \begin{optionkey}{beamer}
+% The \key{beamer} option triggers beamer mode.
 %
 %    \begin{macrocode}
-\define@choicekey{beamerticle}{nuphandout}{2,3,4,6}[6]{}
+\define@boolkey{beamerticle}{beamer}[true]{%
+  \ifKV@beamerticle@beamer
+    \setkeys{beamerticle}{trans=false}
+    \setkeys{beamerticle}{handout=false}
+    \setkeys{beamerticle}{article=false}
+  \fi
+}
 %    \end{macrocode}
 % \end{optionkey}
 %
+% \begin{optionkey}{trans}
+% The \key{trans} option triggers trans mode.
+%
+%    \begin{macrocode}
+\define@boolkey{beamerticle}{trans}[true]{%
+  \ifKV@beamerticle@trans
+    \setkeys{beamerticle}{beamer=false}
+    \setkeys{beamerticle}{handout=false}
+    \setkeys{beamerticle}{article=false}
+  \fi
+}
+%    \end{macrocode}
+% \end{optionkey}
+%
+% \begin{optionkey}{handout}
+%   \begin{optionkey}{nup}
+% The \key{handout} option triggers handout mode, while the \key{nup} option
+% specifies how many slides to include per page.
+%
+%    \begin{macrocode}
+\define@boolkey{beamerticle}{handout}[true]{%
+  \ifKV@beamerticle@handout
+    \setkeys{beamerticle}{beamer=false}
+    \setkeys{beamerticle}{trans=false}
+    \setkeys{beamerticle}{article=false}
+  \fi
+}
+\define@choicekey+{beamerticle}{nup}{2, 3, 4, 6}[6]{}{%
+  \ClassWarning{beamerticle}{Value of `nup' not recognized.
+    Allowed values are 2, 3, 4, and 6.}
+}
+%    \end{macrocode}
+%   \end{optionkey}
+% \end{optionkey}
+%
+% \begin{optionkey}{article}
+% The \key{article} option triggers article mode.
+%
+%    \begin{macrocode}
+\define@boolkey{beamerticle}{article}[true]{%
+  \ifKV@beamerticle@article
+    \setkeys{beamerticle}{beamer=false}
+    \setkeys{beamerticle}{trans=false}
+    \setkeys{beamerticle}{handout=false}
+  \fi
+}
+%    \end{macrocode}
+% \end{optionkey}
+%
+% \begin{optionkey}{also}
+% \begin{optionkey}{alsobeamer}
+% \begin{optionkey}{alsotrans}
+% \begin{optionkey}{alsohandout}
+% \begin{optionkey}{alsoarticle}
+% \begin{macro}{forssvlist}
+% \begin{macro}{beamerticle@SetAlso}
+% The \key{also} option allows the user to specify a set of alternative modes
+% to typeset in parallel, in a space separated list. Alternatively, the user
+% can specify the Boolean \key{also*} options directly.
+%
+%    \begin{macrocode}
+\define@boolkey{beamerticle}{alsobeamer}[true]{}
+\define@boolkey{beamerticle}{alsotrans}[true]{}
+\define@boolkey{beamerticle}{alsohandout}[true]{}
+\define@boolkey{beamerticle}{alsoarticle}[true]{}
+\DeclareListParser*{\forssvlist}{ }%
+\newcommand{\beamerticle@SetAlso}[1]{%
+  \key@ifundefined{beamerticle}{also#1}{%
+    \ClassWarning{beamerticle}{`#1' is not a valid value for option `also'}%
+  }{%
+    \setkeys{beamerticle}{also#1}%
+  }
+}
+\define@key{beamerticle}{also}{%
+  \forssvlist{\beamerticle@SetAlso}{#1}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{optionkey}
+% \end{optionkey}
+% \end{optionkey}
+% \end{optionkey}
+% \end{optionkey}
+%
+% The default behaviour is to use beamer mode.
+%
+%    \begin{macrocode}
+\setkeys{beamerticle}{beamer=true,nup,alsobeamer=false,alsotrans=false,%
+  alsohandout=false,alsoarticle=false}
+%    \end{macrocode}
+%
+% Now we process the options given by the user.
+%
+%    \begin{macrocode}
+\ProcessOptionsX<beamerticle>
+%    \end{macrocode}
+%
+% \subsection{Jobname-based mode switching}
+%
+% \begin{macro}{BeamerSuffix}
+% \begin{macro}{TransSuffix}
+% \begin{macro}{HandoutSuffix}
+% \begin{macro}{ArticleSuffix}
+% We define some default values for the special suffixes.
+%
+%    \begin{macrocode}
+\providecommand*{\BeamerSuffix}{-slides}
+\providecommand*{\TransSuffix}{-trans}
+\providecommand*{\HandoutSuffix}{-handout}
+\providecommand*{\ArticleSuffix}{-notes}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{beamerticle@Spawn}
+% We define a special routine for spawning new \LaTeX\ processes.
+%
+%    \begin{macrocode}
+\newcommand{\beamerticle@Spawn}[1]{%
+  \ifbool{PDFTeX}{%
+    \ShellEscape{latexmk -silent -pdf -synctex=1 -interaction=batchmode -jobname=\jobname#1 \jobname}
+  }{%
+    \ifbool{LuaTeX}{%
+      \ShellEscape{latexmk -silent -lualatex -synctex=1 -interaction=batchmode -jobname=\jobname#1 \jobname}
+    }{%
+      \ifbool{XeTeX}{%
+        \ShellEscape{latexmk -silent -xelatex -synctex=1 -interaction=batchmode -jobname=\jobname#1 \jobname}
+      }{%
+        \ShellEscape{latexmk -silent -synctex=1 -interaction=batchmode -jobname=\jobname#1 \jobname}
+      }%
+    }%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% We check for special jobnames and use them to override the above mode-related
+% options
+%
+%    \begin{macrocode}
+\IfEndWith*{\jobname}{\BeamerSuffix}{%
+  \setkeys{beamerticle}{beamer=true}
+}{%
+  \IfEndWith*{\jobname}{\TransSuffix}{%
+    \setkeys{beamerticle}{trans=true}
+  }{%
+    \IfEndWith*{\jobname}{\HandoutSuffix}{%
+      \setkeys{beamerticle}{handout=true}
+    }{%
+      \IfEndWith*{\jobname}{\ArticleSuffix}{%
+        \setkeys{beamerticle}{article=true}
+      }{%
+        \ifbool{KV@beamerticle@alsobeamer}{%
+          \beamerticle@Spawn{\BeamerSuffix}%
+        }{}
+        \ifbool{KV@beamerticle@alsotrans}{%
+          \beamerticle@Spawn{\TransSuffix}%
+        }{}
+        \ifbool{KV@beamerticle@alsohandout}{%
+          \beamerticle@Spawn{\HandoutSuffix}%
+        }{}
+        \ifbool{KV@beamerticle@alsoarticle}{%
+          \beamerticle@Spawn{\ArticleSuffix}%
+        }{}
+      }%
+    }%
+  }%
+}%
+%    \end{macrocode}
 % There is no more.
 %
 %    \begin{macrocode}
