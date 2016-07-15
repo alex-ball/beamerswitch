@@ -22,7 +22,7 @@ clean:
 	rm -f $(NAME)-example-notes.{aux,bbl,bcf,blg,doc,fdb_latexmk,fls,glo,gls,hd,idx,ilg,ind,ins,listing,log,nav,out,run.xml,snm,synctex.gz,toc,vrb}
 	rm -rf _minted-$(NAME)
 distclean: clean
-	rm -f $(NAME).{pdf,ins,cls} $(NAME)-example.pdf $(NAME)-example-trans.pdf $(NAME)-example-handout.pdf $(NAME)-example-notes.pdf
+	rm -f $(NAME).{pdf,ins,cls} $(NAME)-example.{tex,pdf} $(NAME)-example-trans.pdf $(NAME)-example-handout.pdf $(NAME)-example-notes.pdf
 inst: all
 	mkdir -p $(UTREE)/{tex,source,doc}/latex/$(NAME)
 	mkdir -p $(UTREE)/tex/generic/logos-ubath
