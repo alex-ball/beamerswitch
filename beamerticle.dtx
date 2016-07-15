@@ -37,6 +37,69 @@ This work is "maintained" (as per LPPL maintenance status) by
 [Alex Ball](http://alexball.me.uk/).
 
 %</readme>
+%<*example>
+\PassOptionsToClass{a4paper,12pt}{article}
+\PassOptionsToClass{14pt}{beamer}
+\documentclass[also={trans,handout,article},nup=3]{beamerticle}
+\usepackage[british]{babel}
+\mode<article>{
+  \usepackage[hmargin=3cm,vmargin=2.5cm]{geometry}
+}
+\mode<presentation>{
+  \usefonttheme{professionalfonts}
+}
+\mode<handout>{
+  \usecolortheme{dove}
+}
+\usepackage{libertine}
+
+\title{A demonstration of the \textsf{beamerticle} class}
+\subtitle{Testing features}
+\author{Alex Ball}
+\institute{University of Life}
+\date{1 September 2016}
+\subject{A LaTeX package}
+\keywords{CTAN, literate programming}
+
+\begin{document}
+  \begin{frame}
+    \maketitle
+  \end{frame}
+  
+  This very brief demonstration shows how to use the \textsf{beamerticle} class.
+  It allows easy switching between four \textsf{beamer} modes:
+  
+  \begin{frame}{Beamer modes}
+    \begin{itemize}[<+->]
+      \item \textbf{beamer:} regular slides
+      \item \textbf{trans:} slides suitable for printing on transparencies
+      \item \textbf{handout:} slides suitable for printing on paper
+      \item \textbf{article:} transcript, paper, notes or other article-style
+        document based on the slides
+    \end{itemize}
+  \end{frame}
+  
+  Notice how the text outside frames is only shown in article mode. Also,
+  
+  \begin{frame}{Features shown in this example}
+    \begin{itemize}[<+->]
+      \item Different class options are passed to the \textsf{beamer} and
+        \textsf{article} classes.
+      \item The `trans' and `handout' versions do not have the intermediate
+        slides used by the `beamer' version for uncovering content.
+      \item The handout has three slides to a page with room for handwritten
+        notes at the side, and is in black and white.
+    \end{itemize}
+    
+    \uncover<+->{See the source code of this example to see how it was done.}
+  \end{frame}
+  
+  This PDF also has title and author information saved in the metadata (look
+  at the properties in your PDF viewer).
+  
+  Happy {\LaTeX}ing!
+\end{document}
+%</example>
 %<*internal>
 \fi
 \def\nameofplainTeX{plain}
@@ -66,6 +129,10 @@ Copyright (C) 2015 by Alex Ball <a.ball@ukoln.ac.uk>
 \usedir{tex/latex/\jobname}
 \generate{
   \file{\jobname.cls}{\from{\jobname.dtx}{class}}
+}
+\usedir{doc/latex/\jobname}
+\generate{
+  \file{\jobname-example.tex}{\from{\jobname.dtx}{example}}
 }
 %</install>
 %<install>\endbatchfile
