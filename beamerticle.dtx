@@ -147,6 +147,7 @@ Copyright (C) 2015 by Alex Ball <a.ball@ukoln.ac.uk>
   parsep={0pt plus 0.05em},%
 }
 \usepackage[bookmarks,raiselinks,pageanchor,hyperindex,colorlinks]{hyperref}
+\usepackage{etoolbox}
 \usepackage{tcolorbox,doc}
 \makeatletter
 \renewenvironment{theglossary}{%
@@ -165,7 +166,13 @@ Copyright (C) 2015 by Alex Ball <a.ball@ukoln.ac.uk>
 \colorlet{Color}{cyan!75!black}
 \tcbset
   { listing engine=minted
-  , minted options={breaklines,fontsize=\small,linenos,numbersep=20pt,firstnumber=last}
+  , minted options=
+    { breaklines
+    , fontsize=\footnotesize
+    , linenos
+    , numbersep=20pt
+    , firstnumber=last
+    }
   , index format=pgf
   , color command=Command
   , color environment=Environment
@@ -228,16 +235,17 @@ Copyright (C) 2015 by Alex Ball <a.ball@ukoln.ac.uk>
   \index{\MyName@\tcbIndexPrintValCA {\MyName}|)}%
 }
 \makeatletter
-\AtBeginDocument{%
+\newcommand{\resetmintedformat}{%
   % Comments
-  \expandafter\def\csname PYGdefault@tok@c\endcsname{\let\PYGdefault@it=\textit\def\PYGdefault@tc##1{\textcolor{gray}{##1}}}
+  \expandafter\def\csname PYGdefault@tok@c\endcsname{\let\PYGdefault@it=\textit\def\PYGdefault@tc####1{\textcolor{gray}{####1}}}
   % Command sequences
-  \expandafter\def\csname PYGdefault@tok@k\endcsname{\def\PYGdefault@tc##1{\textcolor{Command}{##1}}}
+  \expandafter\def\csname PYGdefault@tok@k\endcsname{\def\PYGdefault@tc####1{\textcolor{Command}{####1}}}
   % Optional arguments
-  \expandafter\def\csname PYGdefault@tok@na\endcsname{\def\PYGdefault@tc##1{\textcolor{Option}{##1}}}
+  \expandafter\def\csname PYGdefault@tok@na\endcsname{\def\PYGdefault@tc####1{\textcolor{Option}{####1}}}
   % Braces
-  \expandafter\def\csname PYGdefault@tok@nb\endcsname{\def\PYGdefault@tc##1{\textcolor{Environment}{##1}}}
+  \expandafter\def\csname PYGdefault@tok@nb\endcsname{\def\PYGdefault@tc####1{\textcolor{Environment}{####1}}}
 }
+\apptocmd{\minted@checkstyle}{\resetmintedformat}{}{}
 \makeatother
 \newcommand{\pkg}[1]{\href{http://www.ctan.org/pkg/#1}{\textsf{#1}}}
 \MakeShortVerb{\|}
@@ -351,7 +359,9 @@ page where the code is hosted: \url{https://github.com/alex-ball/beamerticle}.
 
 \section{Introduction}
 
-With \pkg{beamer}, it is possible to typeset the same document code in different ways to get different effects. The result you get depends on a potentially confusing mix of options, modes, and indeed classes.
+With \pkg{beamer}, it is possible to typeset the same document code in different
+ways to get different effects. The result you get depends on a potentially
+confusing mix of options, modes, and indeed classes.
 
 Beamer has five modes for typesetting content. There are three modes that
 produce regular slides:
@@ -397,9 +407,15 @@ The final variation is to use a different class altogether, such as
 \pkg{article}, in conjunction with \pkg{beamerarticle}. In this case the content
 is set free-flowing in \key{article} mode, without any of the frame furniture.
 
-The \pkg{beamer} manual suggests coping with all these variations by having the document code in one file, and using it as input to other files that each set up a different mode of operation. This is fine but a bit of a fiddle. Could it be possible to get slides, an article and a handout all from a single run of, say, \pkg{latexmk}?
+The \pkg{beamer} manual suggests coping with all these variations by having the
+document code in one file, and using it as input to other files that each set up
+a different mode of operation. This is fine but a bit of a fiddle. Could it be
+possible to get slides, an article and a handout all from a single run of, say,
+\pkg{latexmk}?
 
-This class is intended as a wrapper around these various options, to simplify the matter of switching between them in a single document. More specifically, it has three main functions:
+This class is intended as a wrapper around these various options, to simplify
+the matter of switching between them in a single document. More specifically, it
+has three main functions:
 
 \begin{enumerate}
 \item
