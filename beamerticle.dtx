@@ -469,7 +469,7 @@ TBC
 % \item
 %   \pkg{xkeyval} for setting options
 % \item
-%   \pkg{etoolbox} for list processing
+%   \pkg{etoolbox} for command patches and list processing
 % \item
 %   \pkg{xstring} for comparisons
 % \item
@@ -479,7 +479,7 @@ TBC
 % \end{itemize}
 %
 %    \begin{macrocode}
-\RequirePackage{xkeyval,etoolbox,xstring,shellesc,iftex}
+\RequirePackage{xkeyval,xkvltxp,etoolbox,xstring,shellesc,iftex}
 %    \end{macrocode}
 %
 % \subsection{Options}
@@ -528,9 +528,11 @@ TBC
     \setkeys{beamerticle}{article=false}
   \fi
 }
-\define@choicekey+{beamerticle}{nup}{2, 3, 4, 6}[6]{}{%
+\define@choicekey+{beamerticle}{nup}{2, 3, 4, 6}[6]{%
+  \def\beamerticle@nup{#1}%
+}{%
   \ClassWarning{beamerticle}{Value of `nup' not recognized.
-    Allowed values are 2, 3, 4, and 6.}
+    Allowed values are 2, 3, 4, and 6.}%
 }
 %    \end{macrocode}
 %   \end{optionkey}
@@ -566,16 +568,15 @@ TBC
 \define@boolkey{beamerticle}{alsotrans}[true]{}
 \define@boolkey{beamerticle}{alsohandout}[true]{}
 \define@boolkey{beamerticle}{alsoarticle}[true]{}
-\DeclareListParser*{\forssvlist}{ }%
 \newcommand{\beamerticle@SetAlso}[1]{%
   \key@ifundefined{beamerticle}{also#1}{%
     \ClassWarning{beamerticle}{`#1' is not a valid value for option `also'}%
   }{%
     \setkeys{beamerticle}{also#1}%
-  }
+  }%
 }
 \define@key{beamerticle}{also}{%
-  \forssvlist{\beamerticle@SetAlso}{#1}%
+  \forcsvlist{\beamerticle@SetAlso}{#1}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -586,11 +587,47 @@ TBC
 % \end{optionkey}
 % \end{optionkey}
 %
-% The default behaviour is to use beamer mode.
+% We also offer some convenvience options to help with formatting the output.
+%
+% \begin{optionkey}{articleframetitles}
+% We offer some alternatives for handling frame titles in article mode.
+% \begin{itemize}
+% \item
+%   \val{inline} is what \pkg{beamerarticle} normally does.
+%   \val{margin} puts the frame titles in the margin.
+%   \val{none} gets rid of them entirely.
+% \end{itemize}
+%
+%    \begin{macrocode}
+\define@choicekey+{beamerticle}{articleframetitles}{inline, margin, none}[inline]{%
+  \def\beamerticle@articleframetitles{#1}%
+}{%
+  \ClassWarning{beamerticle}{Value of `articleframetitles' not recognized.
+    Allowed values are inline, margin, and none.}%
+}
+%    \end{macrocode}
+% \end{optionkey}
+%
+% \begin{optionkey}{handoutpaper}
+% In theory it would be nice to anticipate the paper size that the article mode
+% would use, and pass that as an option to \cs{pgfpagesuselayout} but as that's
+% unlikely to be clean code, we settle here for setting it with an option.
+%
+%    \begin{macrocode}
+\define@key{beamerticle}{handoutpaper}[a4paper]{%
+  \def\beamerticle@handoutpaper{#1}%
+}
+%    \end{macrocode}
+% \end{optionkey}
+%
+% The default behaviour is to use beamer mode only.
+% As for the other options, the defaults are to hide frame titles in article
+% mode and use A4 paper for handouts.
 %
 %    \begin{macrocode}
 \setkeys{beamerticle}{beamer=true,nup,alsobeamer=false,alsotrans=false,%
   alsohandout=false,alsoarticle=false}
+\setkeys{beamerticle}{articleframetitles=none,handoutpaper}
 %    \end{macrocode}
 %
 % Now we process the options given by the user.
@@ -618,11 +655,13 @@ TBC
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{beamerticle@Spawn}
-% We define a special routine for spawning new \LaTeX\ processes.
+% \begin{macro}{BeamerticleSpawn}
+% We provide a special routine for spawning new \LaTeX\ processes. We allow
+% for the possibility of the user overriding this routine with another one,
+% perhaps using a different automation tool.
 %
 %    \begin{macrocode}
-\newcommand{\beamerticle@Spawn}[1]{%
+\providecommand{\BeamerticleSpawn}[1]{%
   \ifbool{PDFTeX}{%
     \ShellEscape{latexmk -silent -pdf -synctex=1 -interaction=batchmode -jobname=\jobname#1 \jobname}
   }{%
@@ -657,22 +696,483 @@ TBC
         \setkeys{beamerticle}{article=true}
       }{%
         \ifbool{KV@beamerticle@alsobeamer}{%
-          \beamerticle@Spawn{\BeamerSuffix}%
+          \BeamerticleSpawn{\BeamerSuffix}%
         }{}
         \ifbool{KV@beamerticle@alsotrans}{%
-          \beamerticle@Spawn{\TransSuffix}%
+          \BeamerticleSpawn{\TransSuffix}%
         }{}
         \ifbool{KV@beamerticle@alsohandout}{%
-          \beamerticle@Spawn{\HandoutSuffix}%
+          \BeamerticleSpawn{\HandoutSuffix}%
         }{}
         \ifbool{KV@beamerticle@alsoarticle}{%
-          \beamerticle@Spawn{\ArticleSuffix}%
+          \BeamerticleSpawn{\ArticleSuffix}%
         }{}
       }%
     }%
   }%
 }%
 %    \end{macrocode}
+%
+% \subsection{Setting up modes}
+%
+% For article mode, we load the \pkg{article} class and the \pkg{beamerarticle}
+% support package. Apologies for anyone hoping for \pkg{scrartcle} or
+% \pkg{memoir} alternatives.
+%
+%    \begin{macrocode}
+\ifbool{KV@beamerticle@article}{%
+  \LoadClass{article}
+  \RequirePackage{beamerarticle}
+%    \end{macrocode}
+%
+% Personally I find slide titles somewhat intrusive in article mode. They can
+% easily end up duplicating section headings in running text, or captions in
+% figures. You may have other ideas, so we keep this behaviour configurable.
+%
+%    \begin{macrocode}
+  \ifcsstring{beamerticle@articleframetitles}{margin}{%
+    \renewcommand{\frametitle}[1]{\marginpar{#1}}%
+    \renewcommand{\framesubtitle}[1]{\marginpar{\emshape #1}}%
+  }{%
+    \ifcsstring{beamerticle@articleframetitles}{none}{%
+      \renewcommand{\frametitle}[1]{}%
+      \renewcommand{\framesubtitle}[1]{}%
+    }{}%
+  }
+%    \end{macrocode}
+%
+% While \pkg{beamer} takes care of adding presentation metadata to the PDF
+% properties, \pkg{beamerarticle} misses the title and author properties. (It
+% does manage to set the subject and keywords, though.) We achieve parity with
+% some additional \cs{hypersetup}. Note that \pkg{beamerarticle} appends the
+% subtitle to \cs{@title} with a linebreak; we adjust this so that a colon is
+% used instead.
+%
+%    \begin{macrocode}
+  \renewcommand{\subtitle}[2][]{\def\insertsubtitle{#2}\g@addto@macro\@title{: #2}}
+  \AtBeginDocument{
+    \begingroup
+    \hypersetup{pdftitle={\@title}}%
+    \def\and{\unskip, }%
+    \let\thanks=\@gobble
+    \let\inst=\@gobble
+    \hypersetup{pdfauthor={\@author}}%
+    \endgroup
+  }
+%    \end{macrocode}
+%
+% We adjust \cs{maketitle} to shave off a little vertical space from the top,
+% and add in a line for the \cs{institute}.
+%
+%    \begin{macrocode}
+  \ifundef{\beamer@originstitute}{%
+    \renewcommand{\institute}[2][]{\def\insertinstitute{#2}}%
+  }{%
+    \renewcommand{\institute}[2][]{\def\insertinstitute{#2}\beamer@originstitute{#2}}%
+  }%
+  \def\@maketitle{%
+    \newpage
+    \null
+    \begin{center}%
+      \let\footnote\thanks
+      {\LARGE \@title \par}%
+      \vskip 1.5em%
+      {%
+        \large\lineskip .5em%
+        \begin{tabular}[t]{c}%
+          \ifundef{\insertauthorurl}{\@author}{\href{\insertauthorurl}{\@author}}%
+        \end{tabular}\par
+      }%
+      \ifdefvoid{\insertinstitute}{}{%
+        {%
+          \normalsize\lineskip .5em%
+          \begin{tabular}[t]{c}%
+            \insertinstitute
+          \end{tabular}%
+        }%
+      }%
+      \par\vskip 1em%
+      {\large \@date \par}%
+    \end{center}%
+    \par\vskip 1.5em%
+  }
+%    \end{macrocode}
+%
+% It seems as though \pkg{beamerarticle} expects \pkg{hyperref} to be loaded,
+% but doesn't actually do it itself. So we oblige, using the default options
+  % specified by \pkg{beamer}.
+%
+%    \begin{macrocode}
+  \RequirePackage[bookmarks=true,%
+    bookmarksopen=true,%
+    pdfborder={0 0 0},%
+    pdfhighlight={/N},%
+    linkbordercolor={.5 .5 .5}]{hyperref}
+ }{%
+%    \end{macrocode}
+%
+% For the presentation modes, we load the \pkg{beamer} class with appropriate
+% options. Since we are targeting users wanting different versions of their
+% presentations with the same code, we activate \key{ignorenonframetext}.
+%
+%    \begin{macrocode}
+  \ifbool{KV@beamerticle@handout}{%
+    \LoadClass[ignorenonframetext,handout]{beamer}
+%    \end{macrocode}
+%
+% Handout mode lays multiple slides out on a single page, as set by the
+    % \key{nup} option. For this we use \pkg{pgfpages} and \pkg{pgf}.
+%
+%    \begin{macrocode}
+    \RequirePackage{pgfpages,pgf}
+%    \end{macrocode}
+%
+% The 2-up layout is just like the normal \key{2 on 1} layout, except it shows
+% the slide borders.
+%
+%    \begin{macrocode}
+    \ifcsstring{beamerticle@nup}{2}{%
+      \pgfpagesdeclarelayout{1 by 2}
+      {
+        \edef\pgfpageoptionheight{\the\paperwidth} % landscaped by default
+        \edef\pgfpageoptionwidth{\the\paperheight}
+        \def\pgfpageoptionborder{0pt}
+        \def\pgfpageoptionfirstshipout{1}
+      }
+      {
+        \pgfpagesphysicalpageoptions
+        {%
+          logical pages=2,%
+          physical height=\pgfpageoptionheight,%
+          physical width=\pgfpageoptionwidth,%
+          current logical shipout=\pgfpageoptionfirstshipout%
+        }
+        \ifdim\paperheight>\paperwidth\relax
+          % put side-by-side
+          \pgfpageslogicalpageoptions{1}
+          {%
+            border shrink=\pgfpageoptionborder,%
+            border code=\pgfstroke,%
+            resized width=.5\pgfphysicalwidth,%
+            resized height=\pgfphysicalheight,%
+            center=\pgfpoint{.25\pgfphysicalwidth}{.5\pgfphysicalheight}%
+          }%
+          \pgfpageslogicalpageoptions{2}
+          {%
+            border shrink=\pgfpageoptionborder,%
+            border code=\pgfstroke,%
+            resized width=.5\pgfphysicalwidth,%
+            resized height=\pgfphysicalheight,%
+            center=\pgfpoint{.75\pgfphysicalwidth}{.5\pgfphysicalheight}%
+          }%
+        \else
+          % stack on top of one another
+          \pgfpageslogicalpageoptions{1}
+          {%
+            border shrink=\pgfpageoptionborder,%
+            border code=\pgfstroke,%
+            resized width=\pgfphysicalwidth,%
+            resized height=.5\pgfphysicalheight,%
+            center=\pgfpoint{.5\pgfphysicalwidth}{.75\pgfphysicalheight}%
+          }%
+          \pgfpageslogicalpageoptions{2}
+          {%
+            border shrink=\pgfpageoptionborder,%
+            border code=\pgfstroke,%
+            resized width=\pgfphysicalwidth,%
+            resized height=.5\pgfphysicalheight,%
+            center=\pgfpoint{.5\pgfphysicalwidth}{.25\pgfphysicalheight}%
+          }%
+        \fi
+      }
+      \pgfpagesuselayout{1 by 2}[\beamerticle@handoutpaper,border shrink=5mm]
+    }{%
+%    \end{macrocode}
+%
+% The \val{3} option sets 3 slides down the left of the page, leaving the right
+% side blank.
+%
+%    \begin{macrocode}
+      \ifcsstring{beamerticle@nup}{3}{%
+        \pgfpagesdeclarelayout{1 by 3}
+        {
+          \edef\pgfpageoptionheight{\the\paperwidth} % landscaped by default
+          \edef\pgfpageoptionwidth{\the\paperheight}
+          \def\pgfpageoptionborder{0pt}
+          \def\pgfpageoptionfirstshipout{1}
+        }
+        {
+          \pgfpagesphysicalpageoptions
+          {%
+            logical pages=3,%
+            physical height=\pgfpageoptionheight,%
+            physical width=\pgfpageoptionwidth,%
+            current logical shipout=\pgfpageoptionfirstshipout%
+          }
+          \ifdim\paperheight>\paperwidth\relax
+            % put side-by-side
+            \pgfpageslogicalpageoptions{1}
+            {%
+              border shrink=\pgfpageoptionborder,%
+              border code=\pgfstroke,%
+              resized width=.333\pgfphysicalwidth,%
+              resized height=.5\pgfphysicalheight,%
+              center=\pgfpoint{.167\pgfphysicalwidth}{.75\pgfphysicalheight}%
+            }%
+            \pgfpageslogicalpageoptions{2}
+            {%
+              border shrink=\pgfpageoptionborder,%
+              border code=\pgfstroke,%
+              resized width=.333\pgfphysicalwidth,%
+              resized height=.5\pgfphysicalheight,%
+              center=\pgfpoint{.5\pgfphysicalwidth}{.75\pgfphysicalheight}%
+            }%
+            \pgfpageslogicalpageoptions{3}
+            {%
+              border shrink=\pgfpageoptionborder,%
+              border code=\pgfstroke,%
+              resized width=.333\pgfphysicalwidth,%
+              resized height=.5\pgfphysicalheight,%
+              center=\pgfpoint{.833\pgfphysicalwidth}{.75\pgfphysicalheight}%
+            }%
+          \else
+            % stack on top of one another
+            \pgfpageslogicalpageoptions{1}
+            {%
+              border shrink=\pgfpageoptionborder,%
+              border code=\pgfstroke,%
+              resized width=.5\pgfphysicalwidth,%
+              resized height=.333\pgfphysicalheight,%
+              center=\pgfpoint{.25\pgfphysicalwidth}{.833\pgfphysicalheight}%
+            }%
+            \pgfpageslogicalpageoptions{2}
+            {%
+              border shrink=\pgfpageoptionborder,%
+              border code=\pgfstroke,%
+              resized width=.5\pgfphysicalwidth,%
+              resized height=.333\pgfphysicalheight,%
+              center=\pgfpoint{.25\pgfphysicalwidth}{.5\pgfphysicalheight}%
+            }%
+            \pgfpageslogicalpageoptions{3}
+            {%
+              border shrink=\pgfpageoptionborder,%
+              border code=\pgfstroke,%
+              resized width=.5\pgfphysicalwidth,%
+              resized height=.333\pgfphysicalheight,%
+              center=\pgfpoint{.25\pgfphysicalwidth}{.167\pgfphysicalheight}%
+            }%
+          \fi
+        }
+        \pgfpagesuselayout{1 by 3}[\beamerticle@handoutpaper,border shrink=5mm]
+      }{%
+%    \end{macrocode}
+%
+% The \val{4} option sets 6 slides on the page, arranged as a sequence of rows
+% (as opposed to a sequence of columns).
+%
+%    \begin{macrocode}
+        \ifcsstring{beamerticle@nup}{4}{%
+          \pgfpagesdeclarelayout{2 by 2}
+          {
+            \edef\pgfpageoptionheight{\the\paperheight} 
+            \edef\pgfpageoptionwidth{\the\paperwidth}
+            \edef\pgfpageoptionborder{0pt}
+          }
+          {
+            \pgfpagesphysicalpageoptions
+            {%
+              logical pages=4,%
+              physical height=\pgfpageoptionheight,%
+              physical width=\pgfpageoptionwidth%
+            }
+            \pgfpageslogicalpageoptions{1}
+            {%
+              border shrink=\pgfpageoptionborder,%
+              border code=\pgfstroke,%
+              resized width=.5\pgfphysicalwidth,%
+              resized height=.5\pgfphysicalheight,%
+              center=\pgfpoint{.25\pgfphysicalwidth}{.75\pgfphysicalheight}%
+            }%
+            \pgfpageslogicalpageoptions{2}
+            {%
+              border shrink=\pgfpageoptionborder,%
+              border code=\pgfstroke,%
+              resized width=.5\pgfphysicalwidth,%
+              resized height=.5\pgfphysicalheight,%
+              center=\pgfpoint{.75\pgfphysicalwidth}{.75\pgfphysicalheight}%
+            }%
+            \pgfpageslogicalpageoptions{3}
+            {%
+              border shrink=\pgfpageoptionborder,%
+              border code=\pgfstroke,%
+              resized width=.5\pgfphysicalwidth,%
+              resized height=.5\pgfphysicalheight,%
+              center=\pgfpoint{.25\pgfphysicalwidth}{.25\pgfphysicalheight}%
+            }%
+            \pgfpageslogicalpageoptions{4}
+            {%
+              border shrink=\pgfpageoptionborder,%
+              border code=\pgfstroke,%
+              resized width=.5\pgfphysicalwidth,%
+              resized height=.5\pgfphysicalheight,%
+              center=\pgfpoint{.75\pgfphysicalwidth}{.25\pgfphysicalheight}%
+            }%
+          }
+          \pgfpagesuselayout{2 by 2}[\beamerticle@handoutpaper,landscape,border shrink=5mm]
+        }{%
+%    \end{macrocode}
+%
+% The \val{6} option sets 6 slides on the page, arranged as a sequence of rows
+% (as opposed to a sequence of columns).
+%
+%    \begin{macrocode}
+          \ifcsstring{beamerticle@nup}{6}{%
+            \pgfpagesdeclarelayout{2 by 3}
+            {
+              \edef\pgfpageoptionheight{\the\paperwidth} % landscaped by default
+              \edef\pgfpageoptionwidth{\the\paperheight}
+              \def\pgfpageoptionborder{0pt}
+              \def\pgfpageoptionfirstshipout{1}
+            }
+            {
+              \pgfpagesphysicalpageoptions
+              {%
+                logical pages=6,%
+                physical height=\pgfpageoptionheight,%
+                physical width=\pgfpageoptionwidth,%
+                current logical shipout=\pgfpageoptionfirstshipout%
+              }
+              \ifdim\paperheight>\paperwidth\relax
+                % put side-by-side
+                \pgfpageslogicalpageoptions{1}
+                {%
+                  border shrink=\pgfpageoptionborder,%
+                  border code=\pgfstroke,%
+                  resized width=.333\pgfphysicalwidth,%
+                  resized height=.5\pgfphysicalheight,%
+                  center=\pgfpoint{.167\pgfphysicalwidth}{.75\pgfphysicalheight}%
+                }%
+                \pgfpageslogicalpageoptions{2}
+                {%
+                  border shrink=\pgfpageoptionborder,%
+                  border code=\pgfstroke,%
+                  resized width=.333\pgfphysicalwidth,%
+                  resized height=.5\pgfphysicalheight,%
+                  center=\pgfpoint{.5\pgfphysicalwidth}{.75\pgfphysicalheight}%
+                }%
+                \pgfpageslogicalpageoptions{3}
+                {%
+                  border shrink=\pgfpageoptionborder,%
+                  border code=\pgfstroke,%
+                  resized width=.333\pgfphysicalwidth,%
+                  resized height=.5\pgfphysicalheight,%
+                  center=\pgfpoint{.833\pgfphysicalwidth}{.75\pgfphysicalheight}%
+                }%
+                \pgfpageslogicalpageoptions{4}
+                {%
+                  border shrink=\pgfpageoptionborder,%
+                  border code=\pgfstroke,%
+                  resized width=.333\pgfphysicalwidth,%
+                  resized height=.5\pgfphysicalheight,%
+                  center=\pgfpoint{.167\pgfphysicalwidth}{.25\pgfphysicalheight}%
+                }%
+                \pgfpageslogicalpageoptions{5}
+                {%
+                  border shrink=\pgfpageoptionborder,%
+                  border code=\pgfstroke,%
+                  resized width=.333\pgfphysicalwidth,%
+                  resized height=.5\pgfphysicalheight,%
+                  center=\pgfpoint{.5\pgfphysicalwidth}{.25\pgfphysicalheight}%
+                }%
+                \pgfpageslogicalpageoptions{6}
+                {%
+                  border shrink=\pgfpageoptionborder,%
+                  border code=\pgfstroke,%
+                  resized width=.333\pgfphysicalwidth,%
+                  resized height=.5\pgfphysicalheight,%
+                  center=\pgfpoint{.833\pgfphysicalwidth}{.25\pgfphysicalheight}%
+                }%
+              \else
+                % stack on top of one another
+                \pgfpageslogicalpageoptions{1}
+                {%
+                  border shrink=\pgfpageoptionborder,%
+                  resized width=.5\pgfphysicalwidth,%
+                  resized height=.333\pgfphysicalheight,%
+                  center=\pgfpoint{.25\pgfphysicalwidth}{.833\pgfphysicalheight}%
+                }%
+                \pgfpageslogicalpageoptions{2}
+                {%
+                  border shrink=\pgfpageoptionborder,%
+                  border code=\pgfstroke,%
+                  resized width=.5\pgfphysicalwidth,%
+                  resized height=.333\pgfphysicalheight,%
+                  center=\pgfpoint{.75\pgfphysicalwidth}{.833\pgfphysicalheight}%
+                }%
+                \pgfpageslogicalpageoptions{3}
+                {%
+                  border shrink=\pgfpageoptionborder,%
+                  border code=\pgfstroke,%
+                  resized width=.5\pgfphysicalwidth,%
+                  resized height=.333\pgfphysicalheight,%
+                  center=\pgfpoint{.25\pgfphysicalwidth}{.5\pgfphysicalheight}%
+                }%
+                \pgfpageslogicalpageoptions{4}
+                {%
+                  border shrink=\pgfpageoptionborder,%
+                  border code=\pgfstroke,%
+                  resized width=.5\pgfphysicalwidth,%
+                  resized height=.333\pgfphysicalheight,%
+                  center=\pgfpoint{.75\pgfphysicalwidth}{.5\pgfphysicalheight}%
+                }%
+                \pgfpageslogicalpageoptions{5}
+                {%
+                  border shrink=\pgfpageoptionborder,%
+                  border code=\pgfstroke,%
+                  resized width=.5\pgfphysicalwidth,%
+                  resized height=.333\pgfphysicalheight,%
+                  center=\pgfpoint{.25\pgfphysicalwidth}{.167\pgfphysicalheight}%
+                }%
+                \pgfpageslogicalpageoptions{6}
+                {%
+                  border shrink=\pgfpageoptionborder,%
+                  border code=\pgfstroke,%
+                  resized width=.5\pgfphysicalwidth,%
+                  resized height=.333\pgfphysicalheight,%
+                  center=\pgfpoint{.75\pgfphysicalwidth}{.167\pgfphysicalheight}%
+                }%
+              \fi
+            }
+            \pgfpagesuselayout{2 by 3}[\beamerticle@handoutpaper,border shrink=5mm]
+          }{}%
+        }%
+      }%
+    }%
+%    \end{macrocode}
+%
+% The other modes are much simpler to handle.
+%
+%    \begin{macrocode}
+  }{%
+    \ifbool{KV@beamerticle@trans}{%
+      \LoadClass[ignorenonframetext,trans]{beamer}
+    }{%
+      \LoadClass[ignorenonframetext]{beamer}
+    }%
+  }
+}
+%    \end{macrocode}
+%
+% \subsection{General fixes}
+%
+% It looks odd to have the \cs{inst} markers from \pkg{beamer} in the maths
+% font, so we replace those definitions with something more in keeping.
+%
+%    \begin{macrocode}
+\def\beamer@insttitle#1{\textsuperscript{#1}}
+\def\beamer@instinst#1{\textsuperscript{#1}\ignorespaces}
+%    \end{macrocode}
+%
 % There is no more.
 %
 %    \begin{macrocode}
