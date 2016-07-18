@@ -15,15 +15,62 @@ using the `article` class.
 
 ### Dependencies
 
-TBC
+To compile the documentation you will need to have the `minted` package working,
+which in turn relies on Python 2.6+ and Pygments. See the documentation of that
+package for details.
+
+There is an example file that demonstrates the features of the class.
+The class itself depends only on packages easily available through TeX
+distributions and CTAN. One feature relies on `latexmk` though you could work
+around that if you have the patience.
+
+Note that the zip file on the [Releases] page on GitHub contains all the files
+you need, pre-compiled.
+
+[Releases]: https://github.com/alex-ball/beamerticle/releases
 
 ### Automated way
 
 A makefile is provided which you can use with the Make utility:
 
-  * Running `make` generates the derived files
-  * Running `make inst` installs the files in the user's TeX tree.
-  * Running `make install` installs the files in the local TeX tree.
+  * Running `make` generates the class file and documentation.
+  * Running `make inst` installs the files to your home TeX tree.
+  * Running `make install` installs the files to the local TeX tree.
+  * Running `make uninst` uninstalls the files to your home TeX tree.
+  * Running `make uninstall` uninstalls the files to the local TeX tree.
+
+### Manual way
+
+To install the class from scratch, follow these instructions. If you have
+downloaded the zip file from the [Releases] page on GitHub, you can skip the
+first two steps.
+
+ 1. Process `beamerticle.dtx` with your favourite version of LaTeX with shell
+    escape enabled (as required by `minted` for typesetting the listings). You
+    will also need to run it through `makeindex`. This will generate the class
+    file and the main documentation (DVI or PDF), plus an example file
+    `beamerticle-example.tex`.
+
+ 2. Process `beamerticle-example.tex` with your favourite version of LaTeX. If
+    you enable shell escape and have `latexmk` installed you will end up with
+    another four documents (DVI or PDF). Otherwise you will get one.
+
+ 3. To install the files, create the following folders in your chosen TeX tree
+    and copy the files across as shown (read `.pdf` as `.dvi` if that is what
+    you generated):
+
+     * `source/latex/beamerticle`:
+       `beamerticle.dtx`,
+       (`beamerticle.ins`)
+     * `tex/latex/beamerticle`:
+       `beamerticle.cls`
+     * `doc/latex/beamerticle`:
+       `beamerticle.pdf`,
+       `beamerticle-example.tex`,
+       `beamerticle-example.pdf`,
+       `beamerticle-example-article.pdf`,
+       `beamerticle-example-handout.pdf`,
+       `beamerticle-example-trans.pdf`
 
 ## Licence
 
@@ -165,24 +212,24 @@ Copyright (C) 2015 by Alex Ball <a.ball@ukoln.ac.uk>
 % Page Layout
 \usepackage[a4paper,hmargin=30mm,vmargin=25mm,nohead]{geometry}
 % Typography
-\RequirePackage[charter,expert]{mathdesign}
+\usepackage[charter,expert]{mathdesign}
 \makeatletter
 \def\hrulefill{\leavevmode\leaders \hrule height \rulethickness \hfill\kern\z@}
 \makeatother
-\RequirePackage{iftex}
+\usepackage{iftex}
 \ifPDFTeX
-  \RequirePackage[utf8]{inputenc}
-  \RequirePackage[T1]{fontenc}
-  \RequirePackage[scaled=0.96,sups]{XCharter}
-  \RequirePackage[scaled=0.95,tabular]{sourcesanspro}
-  \RequirePackage[varl,varqu]{zi4}
+  \usepackage[utf8]{inputenc}
+  \usepackage[T1]{fontenc}
+  \usepackage[scaled=0.96,sups]{XCharter}
+  \usepackage[scaled=0.95,tabular]{sourcesanspro}
+  \usepackage[varl,varqu]{zi4}
 \else
-  \RequirePackage{fontspec}
+  \usepackage{fontspec}
   \setmainfont
     [Scale=0.96
     ,Ligatures=TeX
     ]%
-    {Charis SIL}
+    {XCharter}
   \setsansfont
     [Scale=MatchLowercase
     ,Ligatures=TeX
@@ -206,6 +253,7 @@ Copyright (C) 2015 by Alex Ball <a.ball@ukoln.ac.uk>
 % Improving the look of the documentation
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{6pt plus 2pt minus 1pt}
+\usepackage{multicol}
 \usepackage{enumitem}
 \setlist[itemize]{%
   topsep={6pt plus 2pt minus 1pt},%
@@ -413,7 +461,7 @@ Copyright (C) 2015 by Alex Ball <a.ball@ukoln.ac.uk>
 
 \maketitle
 
-\begin{abstract}\noindent
+\begin{absquote}
 This class is a wrapper around the \pkg{beamer} class to make it easier to use the
 same document to generate the different forms of the presentation: the slides
 themselves, an abbreviated slide set for transparencies or online reference,
@@ -422,7 +470,7 @@ using the \pkg{article} class.
 
 To contact the author about this package, please visit the GitHub
 page where the code is hosted: \url{https://github.com/alex-ball/beamerticle}.
-\end{abstract}
+\end{absquote}
 
 \section{Introduction}
 
@@ -488,18 +536,40 @@ has three main functions:
 \item
   To make it easier, within the same document, to switch between using the
   \pkg{beamer} class and the \pkg{article} class with the
-  \pkg{beamerarticle} package. This includes adding more of what
+  \pkg{beamerarticle} package. This includes adding a little more of what
   \pkg{beamer} does to the \pkg{article} class than does the 
   \pkg{beamerarticle} package.
 \item
-  To offer more choice of handout-mode layouts than the \pkg{beamer} manual
-  gives you, and to make them easier to select.
+  To offer more choice of handout-mode layouts than \pkg{pgfpages} gives you
+  out-of-the-box, and to make them easier to select.
 \item
   To allow you to override the \pkg{beamer} mode from the command line, by
   choosing a given jobname suffix. Primarily this is to allow you to generate
   the different versions programmatically. Indeed, the class provides facilities
   for generating multiple versions with a single command.
 \end{enumerate}
+
+\section{Dependencies}
+
+To use \pkg{beamerticle}, you will need to have the following packages available
+and reasonably up to date on your system. All of these ship with recent \TeX\
+distributions.
+
+\begin{multicols}{3}
+  \begin{itemize}
+    \item \pkg{beamer}
+    \item \pkg{etoolbox}
+    \item \pkg{hyperref}
+    \item \pkg{iftex}
+    \item \pkg{pgf}
+    \item \pkg{shellesc}
+    \item \pkg{xkeyval}
+    \item \pkg{xstring}
+  \end{itemize}
+\end{multicols}
+
+One feature of the class uses \pkg{latexmk} by default, though you can configure
+it to use something else if you need or want to.
 
 \section{Usage}
 
@@ -511,29 +581,310 @@ The class is loaded in the usual way:
 \cs{documentclass}\oarg{options}\brackets{beamerticle}
 \end{tcolorbox}
 
-The following options are recognised:
+The various options are described below.
 
-\begin{docKey}{handout}{}{default \val{6}, initially unset}
-  Not implemented yet.
+\subsection{Choosing the mode of the current run}
+
+The \pkg{beamerticle} class, as explained above, does not do much itself but
+rather helps you to switch between \pkg{beamer} modes, specifically
+\key{article}, \key{beamer}, \key{trans} and \key{handout}.
+
+The normal way of choosing the mode is to use the respective class options.
+
+\begin{docKey}{article}{}{no value, initially unset}
+  Switches to \key{article} mode, which uses the \pkg{article} class and
+  resembles a normal article.
 \end{docKey}
 
-\subsection{Preamble}
+\begin{docKey}{beamer}{}{no value, initially set}
+  Switches to \key{beamer} mode, which uses the \pkg{beamer} class and
+  resembles a normal slideshow.
+\end{docKey}
 
-TBC
+\begin{docKey}{handout}{}{no value, initially unset}
+  Switches to \key{handout} mode, which uses the \pkg{beamer} class but uses a
+  different series of overlay specifications. It resembles a set of printed
+  pages with multiple slides shown on each page.
+\end{docKey}
 
-\subsection{Body}
+\begin{docKey}{trans}{}{no value, initially unset}
+  Switches to \key{trans} mode, which uses the \pkg{beamer} class and
+  resembles a normal slideshow, but uses a different series of overlay
+  specifications.
+\end{docKey}
 
-TBC
+There is, however, a sneaky second way of setting the mode that overrides the
+first, and that is to use the \cs{jobname}. By default, this is the name of your
+\LaTeX\ file minus the \texttt{.tex} extension, but you can set it to something
+else when you run \LaTeX. If you set the \cs{jobname} to end in one of the
+following suffixes, the mode will automatically switch:
+
+\begin{itemize}
+  \item \texttt{-article} will switch to \key{article} mode.
+  \item \texttt{-handout} will switch to \key{handout} mode.
+  \item \texttt{-slides} will switch to \key{beamer} mode.
+  \item \texttt{-trans} will switch to \key{trans} mode.
+\end{itemize}
+
+The idea is that you can keep your source document the same, but by running
+\LaTeX\ with an alternative \cs{jobname}, you can get a different version out
+with a meaningfully different file name.
+
+Of course, you may not want to use those suffixes. Perhaps you want them in
+German; perhaps your document's file name already ends in one of them; perhaps
+`article' or `trans' doesn't describe what you're using those modes for. The
+suffixes are provided by the following commands:
+
+\begin{docCommand}{ArticleSuffix}{}
+  Holds the \cs{jobname} suffix that triggers \key{article} mode.
+\end{docCommand}
+
+\begin{docCommand}{BeamerSuffix}{}
+  Holds the \cs{jobname} suffix that triggers \key{beamer} mode.
+\end{docCommand}
+
+\begin{docCommand}{HandoutSuffix}{}
+  Holds the \cs{jobname} suffix that triggers \key{handout} mode.
+\end{docCommand}
+
+\begin{docCommand}{TransSuffix}{}
+  Holds the \cs{jobname} suffix that triggers \key{trans} mode.
+\end{docCommand}
+
+The CamelCase is an admittedly rather obscure signal to you to define the suffix
+before loading the class:
 
 \begin{dispListing}
-  \newcommand{\ArticleSuffix}{-script}
+\newcommand*{\ArticleSuffix}{-script}
+\documentclass{beamerticle}
 \end{dispListing}
+
+\subsection{Using more than one mode at once}
+
+Another handy feature of the class is that it can spawn parallel compilations,
+so you could in theory generate all four versions from a single command. It
+achieves this magic by escaping to the shell and running \pkg{latexmk}. Thus
+for it to work you need to run \LaTeX\ with shell escape enabled and you need
+\pkg{latexmk} to be installed.
+
+\begin{docKey}{alsoarticle}{}{no value, initially unset}
+  Spawns a new compilation process in \key{article} mode.
+\end{docKey}
+
+\begin{docKey}{alsobeamer}{}{no value, initially unset}
+  Spawns a new compilation process in \key{beamer} mode.
+\end{docKey}
+
+\begin{docKey}{alsohandout}{}{no value, initially unset}
+  Spawns a new compilation process in \key{handout} mode.
+\end{docKey}
+
+\begin{docKey}{alsotrans}{}{no value, initially unset}
+  Spawns a new compilation process in \key{trans} mode.
+\end{docKey}
+
+\begin{docKey}{also}{=\marg{comma-separated list of modes}}{no default, initially empty}
+  Spawns compilation processes in each of the specified modes. Note that the
+  list has to be wrapped in braces, and only the four aforementioned modes are
+  recognized.
+\end{docKey}
+
+If you would rather use a tool other than \pkg{latexmk} to managed your spawned
+compilation processes, it is possible to do that. Bear in mind, though, that
+\pkg{beamerticle} is not clever enough to spot if you have already compiled the
+other version on a previous run so you have to take care of that yourself. The
+command that does the business is this:
+
+\begin{docCommand}{BeamerticleSpawn}{\marg{suffix}}
+  Runs \pkg{latexmk} with \meta{suffix} appended to the \cs{jobname}.
+\end{docCommand}
+
+Again, if you want to pre-define this to do something else, you have to do it
+before loading the class:
+
+\begin{dispListing}
+\newcommand{\BeamerticleSpawn}[1]{%
+  \ShellEscape{...}%
+}
+\documentclass{beamerticle}
+\end{dispListing}
+
+\subsection{Customizing the modes}
+
+There are a few ways of customizing the behaviour of the various modes.
+
+You can use the standard \LaTeX\ methods for customizing how the \pkg{article}
+and \pkg{beamer} classes are loaded:
+
+\begin{dispListing}
+\PassOptionsToClass{a4paper,11pt}{article} % for article mode
+\PassOptionsToClass{utf8}{beamer} % for beamer, handout, trans modes
+\documentclass{beamerticle}
+\end{dispListing}
+
+And of course there is the standard \pkg{beamer} way of passing different
+options to different modes:
+
+\begin{dispListing}
+\documentclass{beamerticle}
+\mode<article>{
+  \usepackage[utf8]{inputenc}
+}
+\mode<handout>{
+  \usecolortheme{dove}
+}
+\end{dispListing}
+
+The \pkg{beamerticle} class also provides a limited number of options itself.
+
+\begin{docKey}{handoutpaper}{=\meta{paper size}}{default \val{a4paper}, initially \val{a4paper}}
+  Selects the size of paper to use for \key{handout} mode. The value is passed
+  directly to \pkg{pgfpages}, so consult the documentation of that package for
+  the allowed values. You can find them under the documentation for the
+  \key{resize to} layout.
+\end{docKey}
+
+\newtcolorbox{pseudopage}[1][]%
+{sharp corners
+  ,width=7.1em
+  ,halign=flush center
+  ,height=10em
+  ,valign=center
+  ,size=fbox
+  ,boxrule=0.5mm
+  ,colback=yellow!5
+  ,#1
+}
+
+\newtcolorbox{pseudoslide}[1][]%
+{nobeforeafter
+  ,width=3em
+  ,halign=flush center
+  ,height=2.25em
+  ,valign=center
+  ,size=fbox
+  ,boxrule=0.5mm
+  ,colframe=ExampleFrame
+  ,colback=ExampleBack
+  ,#1
+}
+\begin{figure}
+  \centering
+  \begin{minipage}[b]{11em}
+    \centering
+    \begin{pseudopage}
+      \begin{pseudoslide}[width=6em,height=4.5em]
+        \texttt{1}
+      \end{pseudoslide}\par\smallskip
+      \begin{pseudoslide}[width=6em,height=4.5em]
+        \texttt{2}
+      \end{pseudoslide}
+    \end{pseudopage}
+    \par
+    (a) \key{nup}=\val{2}
+  \end{minipage}
+  \begin{minipage}[b]{11em}
+    \centering
+    \begin{pseudopage}[halign=flush left]
+      \begin{pseudoslide}\texttt{1}\end{pseudoslide}
+      \par\medskip
+      \begin{pseudoslide}\texttt{2}\end{pseudoslide}
+      \par\medskip
+      \begin{pseudoslide}\texttt{3}\end{pseudoslide}
+    \end{pseudopage}
+    \par
+    (b) \key{nup}=\val{3}
+  \end{minipage}
+  \par\bigskip
+  \begin{minipage}[b]{11em}
+    \centering
+    \begin{pseudopage}[width=10em,height=7.1em]
+      \begin{pseudoslide}[width=4em,height=3em]
+        \texttt{1}
+      \end{pseudoslide}\enspace
+      \begin{pseudoslide}[width=4em,height=3em]
+        \texttt{2}
+      \end{pseudoslide}\par\smallskip
+      \begin{pseudoslide}[width=4em,height=3em]
+        \texttt{3}
+      \end{pseudoslide}\enspace
+      \begin{pseudoslide}[width=4em,height=3em]
+        \texttt{4}
+      \end{pseudoslide}
+    \end{pseudopage}
+    \par
+    (c) \key{nup}=\val{4}
+  \end{minipage}
+  \begin{minipage}[b]{11em}
+    \centering
+    \begin{pseudopage}
+      \begin{pseudoslide}\texttt{1}\end{pseudoslide}
+      \begin{pseudoslide}\texttt{2}\end{pseudoslide}
+      \par\medskip
+      \begin{pseudoslide}\texttt{3}\end{pseudoslide}
+      \begin{pseudoslide}\texttt{4}\end{pseudoslide}
+      \par\medskip
+      \begin{pseudoslide}\texttt{5}\end{pseudoslide}
+      \begin{pseudoslide}\texttt{6}\end{pseudoslide}
+    \end{pseudopage}
+    \par
+    (d) \key{nup}=\val{6}
+  \end{minipage}
+  \par
+  \caption{Handout layouts provided by \pkg{beamerticle}}
+  \label{fig:layouts}
+\end{figure}
+
+\begin{docKey}{nup}{=\val{2}\textbar \val{3}\textbar \val{4}\textbar \val{6}}{default \val{6}, initially \val{6}}
+  Selects how many slides are shown on a single page in \key{handout} mode.
+  The effects of the four possible values are shown in Figure~\ref{fig:layouts}.
+  The layouts for 2 and 4 slides are very similar to the layouts provided as
+  standard by \pkg{pgfpages}, except a thin border is added around the slides
+  (and, as a side effect, any `gaps' at the end of the slide set). The layouts
+  for 3 and 6 slides are not available as standard in \pkg{pgfpages}; they also
+  put thin borders around the slides.
+\end{docKey}
+
+\begin{docKey}{articleframetitles}{=\val{inline}\textbar\val{margin}\textbar\val{none}}{default \val{inline}, initially \val{none}}
+  Affects how frame titles are printed in \key{article} mode. The initial value
+  \docValue{none} removes them entirely. To have them printed as
+  \pkg{beamerarticle} normally does (in bold on a separate line), use
+  \docValue{inline} or pass the option without a value. To have them printed in
+  the margin, use \docValue{margin}.
+\end{docKey}
+
+\subsection{Other features}
+
+There are a few other things that \pkg{beamerticle} does that you should be
+aware of, in case it causes any issues.
+
+In \key{article} mode, \pkg{beamerticle} adjusts the \cs{maketitle} routine so
+that the title is printed closer to the top margin. The subtitle is shown joined
+to the title using a colon. The institute is shown directly beneath the author
+name, similar to the \pkg{beamer} layout. You can use \cs{inst} just as in
+\pkg{beamer} to tie authors to institutes, and \pkg{beamerticle} uses text
+superscript instead of maths superscript for this (in all four modes).
+
+Also in \key{article} mode, \pkg{beamerticle} loads \pkg{hyperref} for you, and
+ensures that \cs{title}, \cs{author}, \cs{subject}, and \cs{keywords} all add
+their values to the PDF metadata, to achieve parity with the presentation modes.
+
+In the presentation modes, \pkg{beamerticle} loads \pkg{beamer} with the
+\key{ignorenonframetext} option, so that text outside frames is only shown in
+\key{article} mode.
+
+\section{Feedback}
+
+I hope you find this class useful. Please report any bugs and add any
+suggestions for improvements or new features to the
+\href{https://github.com/alex-ball/beamerticle/issues}{Issue Tracker} on GitHub.
 
 \StopEventually{^^A
   \PrintChanges
   \printindex
 }
 
+\newpage
 \section{Implementation}
 
 \setcounter{FancyVerbLine}{18}%
@@ -550,13 +901,13 @@ TBC
 % We use the following packages:
 % \begin{itemize}
 % \item
-%   \pkg{xkeyval} for setting options
+%   \pkg{xkeyval} with \pkg{xkvltxp} for setting options
 % \item
 %   \pkg{etoolbox} for command patches and list processing
 % \item
 %   \pkg{xstring} for comparisons
 % \item
-%   \pkg{shellesc} for running extra modes
+%   \pkg{shellesc} for running parallel compilations
 % \item
 %   \pkg{iftex} for determining which engine to use
 % \end{itemize}
@@ -599,7 +950,8 @@ TBC
 % \end{optionkey}
 %
 % \begin{optionkey}{handout}
-%   \begin{optionkey}{nup}
+% \begin{optionkey}{nup}
+% \begin{macro}{beamerticle@nup}
 % The \key{handout} option triggers handout mode, while the \key{nup} option
 % specifies how many slides to include per page.
 %
@@ -618,7 +970,8 @@ TBC
     Allowed values are 2, 3, 4, and 6.}%
 }
 %    \end{macrocode}
-%   \end{optionkey}
+% \end{macro}
+% \end{optionkey}
 % \end{optionkey}
 %
 % \begin{optionkey}{article}
@@ -640,10 +993,9 @@ TBC
 % \begin{optionkey}{alsotrans}
 % \begin{optionkey}{alsohandout}
 % \begin{optionkey}{alsoarticle}
-% \begin{macro}{forssvlist}
 % \begin{macro}{beamerticle@SetAlso}
 % The \key{also} option allows the user to specify a set of alternative modes
-% to typeset in parallel, in a space separated list. Alternatively, the user
+% to typeset in parallel, in a comma-separated list. Alternatively, the user
 % can specify the Boolean \key{also*} options directly.
 %
 %    \begin{macrocode}
@@ -663,21 +1015,21 @@ TBC
 }
 %    \end{macrocode}
 % \end{macro}
-% \end{macro}
 % \end{optionkey}
 % \end{optionkey}
 % \end{optionkey}
 % \end{optionkey}
 % \end{optionkey}
-%
-% We also offer some convenvience options to help with formatting the output.
 %
 % \begin{optionkey}{articleframetitles}
+% \begin{macro}{beamerticle@articleframetitles}
 % We offer some alternatives for handling frame titles in article mode.
 % \begin{itemize}
 % \item
 %   \val{inline} is what \pkg{beamerarticle} normally does.
+% \item
 %   \val{margin} puts the frame titles in the margin.
+% \item
 %   \val{none} gets rid of them entirely.
 % \end{itemize}
 %
@@ -689,9 +1041,11 @@ TBC
     Allowed values are inline, margin, and none.}%
 }
 %    \end{macrocode}
+% \end{macro}
 % \end{optionkey}
 %
 % \begin{optionkey}{handoutpaper}
+% \begin{macro}{beamerticle@handoutpaper}
 % In theory it would be nice to anticipate the paper size that the article mode
 % would use, and pass that as an option to \cs{pgfpagesuselayout} but as that's
 % unlikely to be clean code, we settle here for setting it with an option.
@@ -701,6 +1055,7 @@ TBC
   \def\beamerticle@handoutpaper{#1}%
 }
 %    \end{macrocode}
+% \end{macro}
 % \end{optionkey}
 %
 % The default behaviour is to use beamer mode only.
@@ -763,7 +1118,7 @@ TBC
 % \end{macro}
 %
 % We check for special jobnames and use them to override the above mode-related
-% options
+% options. Note that if this happens, the \key{also*} options are ignored.
 %
 %    \begin{macrocode}
 \IfEndWith*{\jobname}{\BeamerSuffix}{%
@@ -799,7 +1154,7 @@ TBC
 % \subsection{Setting up modes}
 %
 % For article mode, we load the \pkg{article} class and the \pkg{beamerarticle}
-% support package. Apologies for anyone hoping for \pkg{scrartcle} or
+% support package. Apologies for anyone hoping for \pkg{scrartcl} or
 % \pkg{memoir} alternatives.
 %
 %    \begin{macrocode}
@@ -814,7 +1169,7 @@ TBC
 %
 %    \begin{macrocode}
   \ifcsstring{beamerticle@articleframetitles}{margin}{%
-    \renewcommand{\frametitle}[1]{\marginpar{#1}}%
+    \renewcommand{\frametitle}[1]{\marginpar{\bfseries\emshape #1}}%
     \renewcommand{\framesubtitle}[1]{\marginpar{\emshape #1}}%
   }{%
     \ifcsstring{beamerticle@articleframetitles}{none}{%
@@ -883,7 +1238,7 @@ TBC
 %
 % It seems as though \pkg{beamerarticle} expects \pkg{hyperref} to be loaded,
 % but doesn't actually do it itself. So we oblige, using the default options
-  % specified by \pkg{beamer}.
+% specified by \pkg{beamer}.
 %
 %    \begin{macrocode}
   \RequirePackage[bookmarks=true,%
@@ -904,14 +1259,15 @@ TBC
 %    \end{macrocode}
 %
 % Handout mode lays multiple slides out on a single page, as set by the
-    % \key{nup} option. For this we use \pkg{pgfpages} and \pkg{pgf}.
+% \key{nup} option. For this we use \pkg{pgfpages}, with \pkg{pgf} for drawing
+% borders.
 %
 %    \begin{macrocode}
-    \RequirePackage{pgfpages,pgf}
+    \RequirePackage{pgf,pgfpages}
 %    \end{macrocode}
 %
-% The 2-up layout is just like the normal \key{2 on 1} layout, except it shows
-% the slide borders.
+% The \val{2} option sets two slides per page, just like the normal
+% \key{2 on 1} layout, except it shows the slide borders.
 %
 %    \begin{macrocode}
     \ifcsstring{beamerticle@nup}{2}{%
@@ -1050,8 +1406,8 @@ TBC
       }{%
 %    \end{macrocode}
 %
-% The \val{4} option sets 6 slides on the page, arranged as a sequence of rows
-% (as opposed to a sequence of columns).
+% The \val{4} option sets four slides on a landscape page, just like the normal
+% \key{4 on 1} layout, except it shows the slide borders.
 %
 %    \begin{macrocode}
         \ifcsstring{beamerticle@nup}{4}{%
@@ -1105,8 +1461,8 @@ TBC
         }{%
 %    \end{macrocode}
 %
-% The \val{6} option sets 6 slides on the page, arranged as a sequence of rows
-% (as opposed to a sequence of columns).
+% The \val{6} option sets 6 slides on the page, arranged as three rows of two
+% slides each.
 %
 %    \begin{macrocode}
           \ifcsstring{beamerticle@nup}{6}{%
