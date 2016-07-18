@@ -6,6 +6,9 @@ TDIR  = $(TEMP)/$(NAME)
 VERS  = $(shell ltxfileinfo -v $(NAME).dtx)
 LOCAL = $(shell kpsewhich --var-value TEXMFLOCAL)
 UTREE = $(shell kpsewhich --var-value TEXMFHOME)
+
+.PHONY: clean distclean inst install uninst uninstall zip ctan
+
 all:	$(NAME).pdf $(NAME)-example.pdf clean
 	@exit 0
 $(NAME).cls $(NAME)-example.tex: $(NAME).dtx
@@ -25,7 +28,6 @@ distclean: clean
 	rm -f $(NAME).{pdf,ins,cls} $(NAME)-example.{tex,pdf} $(NAME)-example-trans.pdf $(NAME)-example-handout.pdf $(NAME)-example-article.pdf
 inst: all
 	mkdir -p $(UTREE)/{tex,source,doc}/latex/$(NAME)
-	mkdir -p $(UTREE)/tex/generic/logos-ubath
 	cp $(NAME).dtx $(NAME).ins $(UTREE)/source/latex/$(NAME)
 	cp $(NAME).cls $(UTREE)/tex/latex/$(NAME)
 	cp $(NAME).pdf $(NAME)-example.{tex,pdf} $(NAME)-example-trans.pdf $(NAME)-example-handout.pdf $(NAME)-example-article.pdf README.md $(UTREE)/doc/latex/$(NAME)
@@ -35,7 +37,6 @@ uninst:
 	mktexlsr
 install: all
 	sudo mkdir -p $(LOCAL)/{tex,source,doc}/latex/$(NAME)
-	sudo mkdir -p $(LOCAL)/tex/generic/logos-ubath
 	sudo cp $(NAME).dtx $(NAME).ins $(LOCAL)/source/latex/$(NAME)
 	sudo cp $(NAME).cls $(LOCAL)/tex/latex/$(NAME)
 	sudo cp $(NAME).pdf $(NAME)-example.pdf $(NAME)-example-trans.pdf $(NAME)-example-handout.pdf $(NAME)-example-article.pdf README.md $(LOCAL)/doc/latex/$(NAME)
@@ -45,5 +46,9 @@ uninstall:
 	mktexlsr
 zip: all
 	mkdir $(TDIR)
-	cp $(NAME).{pdf,dtx} $(NAME)-example.pdf $(NAME)-example-trans.pdf $(NAME)-example-handout.pdf $(NAME)-example-article.pdf $(NAME).cls README.md Makefile $(TDIR)
+	cp $(NAME).{pdf,dtx} $(NAME)-example.{tex,pdf} $(NAME)-example-trans.pdf $(NAME)-example-handout.pdf $(NAME)-example-article.pdf $(NAME).cls README.md Makefile $(TDIR)
+	cd $(TEMP); zip -Drq $(PWD)/$(NAME)-$(VERS).zip $(NAME)
+ctan: all
+	mkdir $(TDIR)
+	cp $(NAME).{pdf,dtx} $(NAME)-example.pdf $(NAME)-example-trans.pdf $(NAME)-example-handout.pdf $(NAME)-example-article.pdf README.md Makefile $(TDIR)
 	cd $(TEMP); zip -Drq $(PWD)/$(NAME)-$(VERS).zip $(NAME)
