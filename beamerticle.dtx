@@ -844,11 +844,11 @@ The \pkg{beamerticle} class also provides a limited number of options itself.
   put thin borders around the slides.
 \end{docKey}
 
-\begin{docKey}{articleframetitles}{=\val{inline}\textbar\val{margin}\textbar\val{none}}{default \val{inline}, initially \val{none}}
+\begin{docKey}{articleframetitles}{=\val{para}\textbar\val{margin}\textbar\val{none}}{default \val{para}, initially \val{none}}
   Affects how frame titles are printed in \key{article} mode. The initial value
   \docValue{none} removes them entirely. To have them printed as
-  \pkg{beamerarticle} normally does (in bold on a separate line), use
-  \docValue{inline} or pass the option without a value. To have them printed in
+  \pkg{beamerarticle} normally does (as paragraph headings), use
+  \docValue{para} or pass the option without a value. To have them printed in
   the margin, use \docValue{margin}.
 \end{docKey}
 
@@ -1025,7 +1025,7 @@ suggestions for improvements or new features to the
 % We offer some alternatives for handling frame titles in article mode.
 % \begin{itemize}
 % \item
-%   \val{inline} is what \pkg{beamerarticle} normally does.
+%   \val{para} is what \pkg{beamerarticle} normally does.
 % \item
 %   \val{margin} puts the frame titles in the margin.
 % \item
@@ -1033,11 +1033,11 @@ suggestions for improvements or new features to the
 % \end{itemize}
 %
 %    \begin{macrocode}
-\define@choicekey+{beamerticle}{articleframetitles}{inline, margin, none}[inline]{%
+\define@choicekey+{beamerticle}{articleframetitles}{para, margin, none}[para]{%
   \def\beamerticle@articleframetitles{#1}%
 }{%
   \ClassWarning{beamerticle}{Value of `articleframetitles' not recognized.
-    Allowed values are inline, margin, and none.}%
+    Allowed values are para, margin, and none.}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1168,12 +1168,14 @@ suggestions for improvements or new features to the
 %
 %    \begin{macrocode}
   \ifcsstring{beamerticle@articleframetitles}{margin}{%
-    \renewcommand{\frametitle}[1]{\marginpar{\bfseries\emshape #1}}%
-    \renewcommand{\framesubtitle}[1]{\marginpar{\emshape #1}}%
+    \setbeamertemplate{frametitle}{%
+      \marginpar%
+      [\raggedleft\noindent\emshape\textbf{\insertframetitle}\par\noindent\insertframesubtitle\par]%
+      {\raggedright\noindent\emshape\textbf{\insertframetitle}\par\noindent\insertframesubtitle\par}%
+    }
   }{%
     \ifcsstring{beamerticle@articleframetitles}{none}{%
-      \renewcommand{\frametitle}[1]{}%
-      \renewcommand{\framesubtitle}[1]{}%
+      \setbeamertemplate{frametitle}{}
     }{}%
   }
 %    \end{macrocode}
