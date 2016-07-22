@@ -1,4 +1,4 @@
-NAME  = beamerticle
+NAME  = beamerswitch
 SHELL = bash
 PWD   = $(shell pwd)
 TEMP := $(shell mktemp -d -t tmp.XXXXXXXXXX)

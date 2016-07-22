@@ -3,7 +3,7 @@
 \iffalse
 %</internal>
 %<*readme>
-# beamerticle: Convenient mode selection in Beamer documents
+# beamerswitch: Convenient mode selection in Beamer documents
 
 This class is a wrapper around the `beamer` class to make it easier to use the
 same document to generate the different forms of the presentation: the slides
@@ -27,7 +27,7 @@ around that if you have the patience.
 Note that the zip file on the [Releases] page on GitHub contains all the files
 you need, pre-compiled.
 
-[Releases]: https://github.com/alex-ball/beamerticle/releases
+[Releases]: https://github.com/alex-ball/beamerswitch/releases
 
 ### Automated way
 
@@ -45,13 +45,13 @@ To install the class from scratch, follow these instructions. If you have
 downloaded the zip file from the [Releases] page on GitHub, you can skip the
 first two steps.
 
- 1. Process `beamerticle.dtx` with your favourite version of LaTeX with shell
+ 1. Process `beamerswitch.dtx` with your favourite version of LaTeX with shell
     escape enabled (as required by `minted` for typesetting the listings). You
     will also need to run it through `makeindex`. This will generate the class
     file and the main documentation (DVI or PDF), plus an example file
-    `beamerticle-example.tex`.
+    `beamerswitch-example.tex`.
 
- 2. Process `beamerticle-example.tex` with your favourite version of LaTeX. If
+ 2. Process `beamerswitch-example.tex` with your favourite version of LaTeX. If
     you enable shell escape and have `latexmk` installed you will end up with
     another four documents (DVI or PDF). Otherwise you will get one.
 
@@ -59,22 +59,22 @@ first two steps.
     and copy the files across as shown (read `.pdf` as `.dvi` if that is what
     you generated):
 
-     * `source/latex/beamerticle`:
-       `beamerticle.dtx`,
-       (`beamerticle.ins`)
-     * `tex/latex/beamerticle`:
-       `beamerticle.cls`
-     * `doc/latex/beamerticle`:
-       `beamerticle.pdf`,
-       `beamerticle-example.tex`,
-       `beamerticle-example.pdf`,
-       `beamerticle-example-article.pdf`,
-       `beamerticle-example-handout.pdf`,
-       `beamerticle-example-trans.pdf`
+     * `source/latex/beamerswitch`:
+       `beamerswitch.dtx`,
+       (`beamerswitch.ins`)
+     * `tex/latex/beamerswitch`:
+       `beamerswitch.cls`
+     * `doc/latex/beamerswitch`:
+       `beamerswitch.pdf`,
+       `beamerswitch-example.tex`,
+       `beamerswitch-example.pdf`,
+       `beamerswitch-example-article.pdf`,
+       `beamerswitch-example-handout.pdf`,
+       `beamerswitch-example-trans.pdf`
 
 ## Licence
 
-This work consists of the file beamerticle.dtx and a Makefile.
+This work consists of the file beamerswitch.dtx and a Makefile.
 
 This work may be distributed and/or modified under the conditions of the
 [LaTeX Project Public License (LPPL)](http://www.latex-project.org/lppl.txt),
@@ -87,7 +87,7 @@ This work is "maintained" (as per LPPL maintenance status) by
 %<*example>
 \PassOptionsToClass{a4paper,12pt}{article}
 \PassOptionsToClass{14pt}{beamer}
-\documentclass[also={trans,handout,article},nup=3]{beamerticle}
+\documentclass[also={trans,handout,article},nup=3]{beamerswitch}
 \usepackage[british]{babel}
 \mode<article>{
   \usepackage[hmargin=3cm,vmargin=2.5cm]{geometry}
@@ -100,7 +100,7 @@ This work is "maintained" (as per LPPL maintenance status) by
 }
 \usepackage{libertine}
 
-\title{A demonstration of the \textsf{beamerticle} class}
+\title{A demonstration of the \textsf{beamerswitch} class}
 \subtitle{Testing features}
 \author{Alex Ball}
 \institute{University of Life}
@@ -113,7 +113,7 @@ This work is "maintained" (as per LPPL maintenance status) by
     \maketitle
   \end{frame}
   
-  This very brief demonstration shows how to use the \textsf{beamerticle} class.
+  This very brief demonstration shows how to use the \textsf{beamerswitch} class.
   It allows easy switching between four \textsf{beamer} modes:
   
   \begin{frame}{Beamer modes}
@@ -160,7 +160,7 @@ This work is "maintained" (as per LPPL maintenance status) by
 \askforoverwritefalse
 \preamble
 ----------------------------------------------------------------
-beamerticle --- Convenient mode selection in Beamer documents
+beamerswitch --- Convenient mode selection in Beamer documents
 Author:  Alex Ball
 E-mail:  a.j.ball@bath.ac.uk
 License: Released under the LaTeX Project Public License v1.3c or later
@@ -200,10 +200,10 @@ Copyright (C) 2015 by Alex Ball <a.ball@ukoln.ac.uk>
 \fi
 %</internal>
 %<*driver>
-\ProvidesFile{beamerticle.dtx}
+\ProvidesFile{beamerswitch.dtx}
 %</driver>
 %<class>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
-%<class>\ProvidesClass{beamerticle}
+%<class>\ProvidesClass{beamerswitch}
 %<*class>
     [2016/07/18 v0.1 Convenient mode selection in Beamer documents]
 %</class>
@@ -455,7 +455,7 @@ Copyright (C) 2015 by Alex Ball <a.ball@ukoln.ac.uk>
 \GetFileInfo{\jobname.dtx}
 \DoNotIndex{\documentclass,\newcommand,\newenvironment}
 
-\title{\textsf{beamerticle} --- Convenient mode selection in Beamer documents}
+\title{\textsf{beamerswitch} --- Convenient mode selection in Beamer documents}
 \author{Alex Ball}
 \date{Class \fileversion\ --- \filedate}
 
@@ -469,7 +469,7 @@ an n-up handout version, but most significantly a transcript or set of notes
 using the \pkg{article} class.
 
 To contact the author about this package, please visit the GitHub
-page where the code is hosted: \url{https://github.com/alex-ball/beamerticle}.
+page where the code is hosted: \url{https://github.com/alex-ball/beamerswitch}.
 \end{absquote}
 
 \section{Introduction}
@@ -550,7 +550,7 @@ has three main functions:
 
 \section{Dependencies}
 
-To use \pkg{beamerticle}, you will need to have the following packages available
+To use \pkg{beamerswitch}, you will need to have the following packages available
 and reasonably up to date on your system. All of these ship with recent \TeX\
 distributions.
 
@@ -577,14 +577,14 @@ it to use something else if you need or want to.
 The class is loaded in the usual way:
 
 \begin{tcolorbox}[docexample,fontupper=\small]
-\cs{documentclass}\oarg{options}\brackets{beamerticle}
+\cs{documentclass}\oarg{options}\brackets{beamerswitch}
 \end{tcolorbox}
 
 The various options are described below.
 
 \subsection{Choosing the mode of the current run}
 
-The \pkg{beamerticle} class, as explained above, does not do much itself but
+The \pkg{beamerswitch} class, as explained above, does not do much itself but
 rather helps you to switch between \pkg{beamer} modes, specifically
 \key{article}, \key{beamer}, \key{trans} and \key{handout}.
 
@@ -655,7 +655,7 @@ before loading the class:
 
 \begin{dispListing}
 \newcommand*{\ArticleSuffix}{-script}
-\documentclass{beamerticle}
+\documentclass{beamerswitch}
 \end{dispListing}
 
 \subsection{Using more than one mode at once}
@@ -690,11 +690,11 @@ for it to work you need to run \LaTeX\ with shell escape enabled and you need
 
 If you would rather use a tool other than \pkg{latexmk} to managed your spawned
 compilation processes, it is possible to do that. Bear in mind, though, that
-\pkg{beamerticle} is not clever enough to spot if you have already compiled the
+\pkg{beamerswitch} is not clever enough to spot if you have already compiled the
 other version on a previous run so you have to take care of that yourself. The
 command that does the business is this:
 
-\begin{docCommand}{BeamerticleSpawn}{\marg{suffix}}
+\begin{docCommand}{BeamerswitchSpawn}{\marg{suffix}}
   Runs \pkg{latexmk} with \meta{suffix} appended to the \cs{jobname}.
 \end{docCommand}
 
@@ -702,10 +702,10 @@ Again, if you want to pre-define this to do something else, you have to do it
 before loading the class:
 
 \begin{dispListing}
-\newcommand{\BeamerticleSpawn}[1]{%
+\newcommand{\BeamerswitchSpawn}[1]{%
   \ShellEscape{...}%
 }
-\documentclass{beamerticle}
+\documentclass{beamerswitch}
 \end{dispListing}
 
 \subsection{Customizing the modes}
@@ -718,14 +718,14 @@ and \pkg{beamer} classes are loaded:
 \begin{dispListing}
 \PassOptionsToClass{a4paper,11pt}{article} % for article mode
 \PassOptionsToClass{utf8}{beamer} % for beamer, handout, trans modes
-\documentclass{beamerticle}
+\documentclass{beamerswitch}
 \end{dispListing}
 
 And of course there is the standard \pkg{beamer} way of passing different
 options to different modes:
 
 \begin{dispListing}
-\documentclass{beamerticle}
+\documentclass{beamerswitch}
 \mode<article>{
   \usepackage[utf8]{inputenc}
 }
@@ -734,7 +734,7 @@ options to different modes:
 }
 \end{dispListing}
 
-The \pkg{beamerticle} class also provides a limited number of options itself.
+The \pkg{beamerswitch} class also provides a limited number of options itself.
 
 \begin{docKey}{handoutpaper}{=\meta{paper size}}{default \val{a4paper}, initially \val{a4paper}}
   Selects the size of paper to use for \key{handout} mode. The value is passed
@@ -830,7 +830,7 @@ The \pkg{beamerticle} class also provides a limited number of options itself.
     (d) \key{nup}=\val{6}
   \end{minipage}
   \par
-  \caption{Handout layouts provided by \pkg{beamerticle}}
+  \caption{Handout layouts provided by \pkg{beamerswitch}}
   \label{fig:layouts}
 \end{figure}
 
@@ -854,21 +854,21 @@ The \pkg{beamerticle} class also provides a limited number of options itself.
 
 \subsection{Other features}
 
-There are a few other things that \pkg{beamerticle} does that you should be
+There are a few other things that \pkg{beamerswitch} does that you should be
 aware of, in case it causes any issues.
 
-In \key{article} mode, \pkg{beamerticle} adjusts the \cs{maketitle} routine so
+In \key{article} mode, \pkg{beamerswitch} adjusts the \cs{maketitle} routine so
 that the title is printed closer to the top margin. The subtitle is shown joined
 to the title using a colon. The institute is shown directly beneath the author
 name, similar to the \pkg{beamer} layout. You can use \cs{inst} just as in
-\pkg{beamer} to tie authors to institutes, and \pkg{beamerticle} uses text
+\pkg{beamer} to tie authors to institutes, and \pkg{beamerswitch} uses text
 superscript instead of maths superscript for this (in all four modes).
 
-Also in \key{article} mode, \pkg{beamerticle} loads \pkg{hyperref} for you, and
+Also in \key{article} mode, \pkg{beamerswitch} loads \pkg{hyperref} for you, and
 ensures that \cs{title}, \cs{author}, \cs{subject}, and \cs{keywords} all add
 their values to the PDF metadata, to achieve parity with the presentation modes.
 
-In the presentation modes, \pkg{beamerticle} loads \pkg{beamer} with the
+In the presentation modes, \pkg{beamerswitch} loads \pkg{beamer} with the
 \key{ignorenonframetext} option, so that text outside frames is only shown in
 \key{article} mode.
 
@@ -876,7 +876,7 @@ In the presentation modes, \pkg{beamerticle} loads \pkg{beamer} with the
 
 I hope you find this class useful. Please report any bugs and add any
 suggestions for improvements or new features to the
-\href{https://github.com/alex-ball/beamerticle/issues}{Issue Tracker} on GitHub.
+\href{https://github.com/alex-ball/beamerswitch/issues}{Issue Tracker} on GitHub.
 
 \StopEventually{^^A
   \PrintChanges
@@ -924,11 +924,11 @@ suggestions for improvements or new features to the
 % The \key{beamer} option triggers beamer mode.
 %
 %    \begin{macrocode}
-\define@boolkey{beamerticle}{beamer}[true]{%
-  \ifKV@beamerticle@beamer
-    \setkeys{beamerticle}{trans=false}
-    \setkeys{beamerticle}{handout=false}
-    \setkeys{beamerticle}{article=false}
+\define@boolkey{beamerswitch}{beamer}[true]{%
+  \ifKV@beamerswitch@beamer
+    \setkeys{beamerswitch}{trans=false}
+    \setkeys{beamerswitch}{handout=false}
+    \setkeys{beamerswitch}{article=false}
   \fi
 }
 %    \end{macrocode}
@@ -938,11 +938,11 @@ suggestions for improvements or new features to the
 % The \key{trans} option triggers trans mode.
 %
 %    \begin{macrocode}
-\define@boolkey{beamerticle}{trans}[true]{%
-  \ifKV@beamerticle@trans
-    \setkeys{beamerticle}{beamer=false}
-    \setkeys{beamerticle}{handout=false}
-    \setkeys{beamerticle}{article=false}
+\define@boolkey{beamerswitch}{trans}[true]{%
+  \ifKV@beamerswitch@trans
+    \setkeys{beamerswitch}{beamer=false}
+    \setkeys{beamerswitch}{handout=false}
+    \setkeys{beamerswitch}{article=false}
   \fi
 }
 %    \end{macrocode}
@@ -950,22 +950,22 @@ suggestions for improvements or new features to the
 %
 % \begin{optionkey}{handout}
 % \begin{optionkey}{nup}
-% \begin{macro}{beamerticle@nup}
+% \begin{macro}{beamerswitch@nup}
 % The \key{handout} option triggers handout mode, while the \key{nup} option
 % specifies how many slides to include per page.
 %
 %    \begin{macrocode}
-\define@boolkey{beamerticle}{handout}[true]{%
-  \ifKV@beamerticle@handout
-    \setkeys{beamerticle}{beamer=false}
-    \setkeys{beamerticle}{trans=false}
-    \setkeys{beamerticle}{article=false}
+\define@boolkey{beamerswitch}{handout}[true]{%
+  \ifKV@beamerswitch@handout
+    \setkeys{beamerswitch}{beamer=false}
+    \setkeys{beamerswitch}{trans=false}
+    \setkeys{beamerswitch}{article=false}
   \fi
 }
-\define@choicekey+{beamerticle}{nup}{2, 3, 4, 6}[6]{%
-  \def\beamerticle@nup{#1}%
+\define@choicekey+{beamerswitch}{nup}{2, 3, 4, 6}[6]{%
+  \def\beamerswitch@nup{#1}%
 }{%
-  \ClassWarning{beamerticle}{Value of `nup' not recognized.
+  \ClassWarning{beamerswitch}{Value of `nup' not recognized.
     Allowed values are 2, 3, 4, and 6.}%
 }
 %    \end{macrocode}
@@ -977,11 +977,11 @@ suggestions for improvements or new features to the
 % The \key{article} option triggers article mode.
 %
 %    \begin{macrocode}
-\define@boolkey{beamerticle}{article}[true]{%
-  \ifKV@beamerticle@article
-    \setkeys{beamerticle}{beamer=false}
-    \setkeys{beamerticle}{trans=false}
-    \setkeys{beamerticle}{handout=false}
+\define@boolkey{beamerswitch}{article}[true]{%
+  \ifKV@beamerswitch@article
+    \setkeys{beamerswitch}{beamer=false}
+    \setkeys{beamerswitch}{trans=false}
+    \setkeys{beamerswitch}{handout=false}
   \fi
 }
 %    \end{macrocode}
@@ -992,25 +992,25 @@ suggestions for improvements or new features to the
 % \begin{optionkey}{alsotrans}
 % \begin{optionkey}{alsohandout}
 % \begin{optionkey}{alsoarticle}
-% \begin{macro}{beamerticle@SetAlso}
+% \begin{macro}{beamerswitch@SetAlso}
 % The \key{also} option allows the user to specify a set of alternative modes
 % to typeset in parallel, in a comma-separated list. Alternatively, the user
 % can specify the Boolean \key{also*} options directly.
 %
 %    \begin{macrocode}
-\define@boolkey{beamerticle}{alsobeamer}[true]{}
-\define@boolkey{beamerticle}{alsotrans}[true]{}
-\define@boolkey{beamerticle}{alsohandout}[true]{}
-\define@boolkey{beamerticle}{alsoarticle}[true]{}
-\newcommand{\beamerticle@SetAlso}[1]{%
-  \key@ifundefined{beamerticle}{also#1}{%
-    \ClassWarning{beamerticle}{`#1' is not a valid value for option `also'}%
+\define@boolkey{beamerswitch}{alsobeamer}[true]{}
+\define@boolkey{beamerswitch}{alsotrans}[true]{}
+\define@boolkey{beamerswitch}{alsohandout}[true]{}
+\define@boolkey{beamerswitch}{alsoarticle}[true]{}
+\newcommand{\beamerswitch@SetAlso}[1]{%
+  \key@ifundefined{beamerswitch}{also#1}{%
+    \ClassWarning{beamerswitch}{`#1' is not a valid value for option `also'}%
   }{%
-    \setkeys{beamerticle}{also#1}%
+    \setkeys{beamerswitch}{also#1}%
   }%
 }
-\define@key{beamerticle}{also}{%
-  \forcsvlist{\beamerticle@SetAlso}{#1}%
+\define@key{beamerswitch}{also}{%
+  \forcsvlist{\beamerswitch@SetAlso}{#1}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1021,7 +1021,7 @@ suggestions for improvements or new features to the
 % \end{optionkey}
 %
 % \begin{optionkey}{articleframetitles}
-% \begin{macro}{beamerticle@articleframetitles}
+% \begin{macro}{beamerswitch@articleframetitles}
 % We offer some alternatives for handling frame titles in article mode.
 % \begin{itemize}
 % \item
@@ -1033,10 +1033,10 @@ suggestions for improvements or new features to the
 % \end{itemize}
 %
 %    \begin{macrocode}
-\define@choicekey+{beamerticle}{articleframetitles}{para, margin, none}[para]{%
-  \def\beamerticle@articleframetitles{#1}%
+\define@choicekey+{beamerswitch}{articleframetitles}{para, margin, none}[para]{%
+  \def\beamerswitch@articleframetitles{#1}%
 }{%
-  \ClassWarning{beamerticle}{Value of `articleframetitles' not recognized.
+  \ClassWarning{beamerswitch}{Value of `articleframetitles' not recognized.
     Allowed values are para, margin, and none.}%
 }
 %    \end{macrocode}
@@ -1044,14 +1044,14 @@ suggestions for improvements or new features to the
 % \end{optionkey}
 %
 % \begin{optionkey}{handoutpaper}
-% \begin{macro}{beamerticle@handoutpaper}
+% \begin{macro}{beamerswitch@handoutpaper}
 % In theory it would be nice to anticipate the paper size that the article mode
 % would use, and pass that as an option to \cs{pgfpagesuselayout} but as that's
 % unlikely to be clean code, we settle here for setting it with an option.
 %
 %    \begin{macrocode}
-\define@key{beamerticle}{handoutpaper}[a4paper]{%
-  \def\beamerticle@handoutpaper{#1}%
+\define@key{beamerswitch}{handoutpaper}[a4paper]{%
+  \def\beamerswitch@handoutpaper{#1}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1062,15 +1062,15 @@ suggestions for improvements or new features to the
 % mode and use A4 paper for handouts.
 %
 %    \begin{macrocode}
-\setkeys{beamerticle}{beamer=true,nup,alsobeamer=false,alsotrans=false,%
+\setkeys{beamerswitch}{beamer=true,nup,alsobeamer=false,alsotrans=false,%
   alsohandout=false,alsoarticle=false}
-\setkeys{beamerticle}{articleframetitles=none,handoutpaper}
+\setkeys{beamerswitch}{articleframetitles=none,handoutpaper}
 %    \end{macrocode}
 %
 % Now we process the options given by the user.
 %
 %    \begin{macrocode}
-\ProcessOptionsX<beamerticle>
+\ProcessOptionsX<beamerswitch>
 %    \end{macrocode}
 %
 % \subsection{Jobname-based mode switching}
@@ -1092,13 +1092,13 @@ suggestions for improvements or new features to the
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{BeamerticleSpawn}
+% \begin{macro}{BeamerswitchSpawn}
 % We provide a special routine for spawning new \LaTeX\ processes. We allow
 % for the possibility of the user overriding this routine with another one,
 % perhaps using a different automation tool.
 %
 %    \begin{macrocode}
-\providecommand{\BeamerticleSpawn}[1]{%
+\providecommand{\BeamerswitchSpawn}[1]{%
   \ifbool{PDFTeX}{%
     \ShellEscape{latexmk -silent -pdf -synctex=1 -interaction=batchmode -jobname=\jobname#1 \jobname}
   }{%
@@ -1121,28 +1121,28 @@ suggestions for improvements or new features to the
 %
 %    \begin{macrocode}
 \IfEndWith*{\jobname}{\BeamerSuffix}{%
-  \setkeys{beamerticle}{beamer=true}
+  \setkeys{beamerswitch}{beamer=true}
 }{%
   \IfEndWith*{\jobname}{\TransSuffix}{%
-    \setkeys{beamerticle}{trans=true}
+    \setkeys{beamerswitch}{trans=true}
   }{%
     \IfEndWith*{\jobname}{\HandoutSuffix}{%
-      \setkeys{beamerticle}{handout=true}
+      \setkeys{beamerswitch}{handout=true}
     }{%
       \IfEndWith*{\jobname}{\ArticleSuffix}{%
-        \setkeys{beamerticle}{article=true}
+        \setkeys{beamerswitch}{article=true}
       }{%
-        \ifbool{KV@beamerticle@alsobeamer}{%
-          \BeamerticleSpawn{\BeamerSuffix}%
+        \ifbool{KV@beamerswitch@alsobeamer}{%
+          \BeamerswitchSpawn{\BeamerSuffix}%
         }{}
-        \ifbool{KV@beamerticle@alsotrans}{%
-          \BeamerticleSpawn{\TransSuffix}%
+        \ifbool{KV@beamerswitch@alsotrans}{%
+          \BeamerswitchSpawn{\TransSuffix}%
         }{}
-        \ifbool{KV@beamerticle@alsohandout}{%
-          \BeamerticleSpawn{\HandoutSuffix}%
+        \ifbool{KV@beamerswitch@alsohandout}{%
+          \BeamerswitchSpawn{\HandoutSuffix}%
         }{}
-        \ifbool{KV@beamerticle@alsoarticle}{%
-          \BeamerticleSpawn{\ArticleSuffix}%
+        \ifbool{KV@beamerswitch@alsoarticle}{%
+          \BeamerswitchSpawn{\ArticleSuffix}%
         }{}
       }%
     }%
@@ -1157,7 +1157,7 @@ suggestions for improvements or new features to the
 % \pkg{memoir} alternatives.
 %
 %    \begin{macrocode}
-\ifbool{KV@beamerticle@article}{%
+\ifbool{KV@beamerswitch@article}{%
   \LoadClass{article}
   \RequirePackage{beamerarticle}
 %    \end{macrocode}
@@ -1167,14 +1167,14 @@ suggestions for improvements or new features to the
 % figures. You may have other ideas, so we keep this behaviour configurable.
 %
 %    \begin{macrocode}
-  \ifcsstring{beamerticle@articleframetitles}{margin}{%
+  \ifcsstring{beamerswitch@articleframetitles}{margin}{%
     \setbeamertemplate{frametitle}{%
       \marginpar%
       [\raggedleft\noindent\emshape\textbf{\insertframetitle}\par\noindent\insertframesubtitle\par]%
       {\raggedright\noindent\emshape\textbf{\insertframetitle}\par\noindent\insertframesubtitle\par}%
     }
   }{%
-    \ifcsstring{beamerticle@articleframetitles}{none}{%
+    \ifcsstring{beamerswitch@articleframetitles}{none}{%
       \setbeamertemplate{frametitle}{}
     }{}%
   }
@@ -1255,7 +1255,7 @@ suggestions for improvements or new features to the
 % presentations with the same code, we activate \key{ignorenonframetext}.
 %
 %    \begin{macrocode}
-  \ifbool{KV@beamerticle@handout}{%
+  \ifbool{KV@beamerswitch@handout}{%
     \LoadClass[ignorenonframetext,handout]{beamer}
 %    \end{macrocode}
 %
@@ -1271,7 +1271,7 @@ suggestions for improvements or new features to the
 % \key{2 on 1} layout, except it shows the slide borders.
 %
 %    \begin{macrocode}
-    \ifcsstring{beamerticle@nup}{2}{%
+    \ifcsstring{beamerswitch@nup}{2}{%
       \pgfpagesdeclarelayout{1 by 2}
       {
         \edef\pgfpageoptionheight{\the\paperwidth} % landscaped by default
@@ -1325,7 +1325,7 @@ suggestions for improvements or new features to the
           }%
         \fi
       }
-      \pgfpagesuselayout{1 by 2}[\beamerticle@handoutpaper,border shrink=5mm]
+      \pgfpagesuselayout{1 by 2}[\beamerswitch@handoutpaper,border shrink=5mm]
     }{%
 %    \end{macrocode}
 %
@@ -1333,7 +1333,7 @@ suggestions for improvements or new features to the
 % side blank.
 %
 %    \begin{macrocode}
-      \ifcsstring{beamerticle@nup}{3}{%
+      \ifcsstring{beamerswitch@nup}{3}{%
         \pgfpagesdeclarelayout{1 by 3}
         {
           \edef\pgfpageoptionheight{\the\paperwidth} % landscaped by default
@@ -1403,7 +1403,7 @@ suggestions for improvements or new features to the
             }%
           \fi
         }
-        \pgfpagesuselayout{1 by 3}[\beamerticle@handoutpaper,border shrink=5mm]
+        \pgfpagesuselayout{1 by 3}[\beamerswitch@handoutpaper,border shrink=5mm]
       }{%
 %    \end{macrocode}
 %
@@ -1411,7 +1411,7 @@ suggestions for improvements or new features to the
 % \key{4 on 1} layout, except it shows the slide borders.
 %
 %    \begin{macrocode}
-        \ifcsstring{beamerticle@nup}{4}{%
+        \ifcsstring{beamerswitch@nup}{4}{%
           \pgfpagesdeclarelayout{2 by 2}
           {
             \edef\pgfpageoptionheight{\the\paperheight} 
@@ -1458,7 +1458,7 @@ suggestions for improvements or new features to the
               center=\pgfpoint{.75\pgfphysicalwidth}{.25\pgfphysicalheight}%
             }%
           }
-          \pgfpagesuselayout{2 by 2}[\beamerticle@handoutpaper,landscape,border shrink=5mm]
+          \pgfpagesuselayout{2 by 2}[\beamerswitch@handoutpaper,landscape,border shrink=5mm]
         }{%
 %    \end{macrocode}
 %
@@ -1466,7 +1466,7 @@ suggestions for improvements or new features to the
 % slides each.
 %
 %    \begin{macrocode}
-          \ifcsstring{beamerticle@nup}{6}{%
+          \ifcsstring{beamerswitch@nup}{6}{%
             \pgfpagesdeclarelayout{2 by 3}
             {
               \edef\pgfpageoptionheight{\the\paperwidth} % landscaped by default
@@ -1583,7 +1583,7 @@ suggestions for improvements or new features to the
                 }%
               \fi
             }
-            \pgfpagesuselayout{2 by 3}[\beamerticle@handoutpaper,border shrink=5mm]
+            \pgfpagesuselayout{2 by 3}[\beamerswitch@handoutpaper,border shrink=5mm]
           }{}%
         }%
       }%
@@ -1594,7 +1594,7 @@ suggestions for improvements or new features to the
 %
 %    \begin{macrocode}
   }{%
-    \ifbool{KV@beamerticle@trans}{%
+    \ifbool{KV@beamerswitch@trans}{%
       \LoadClass[ignorenonframetext,trans]{beamer}
     }{%
       \LoadClass[ignorenonframetext]{beamer}
