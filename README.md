@@ -1,4 +1,4 @@
-# beamerticle: Convenient mode selection in Beamer documents
+# beamerswitch: Convenient mode selection in Beamer documents
 
 This class is a wrapper around the `beamer` class to make it easier to use the
 same document to generate the different forms of the presentation: the slides
@@ -22,7 +22,7 @@ around that if you have the patience.
 Note that the zip file on the [Releases] page on GitHub contains all the files
 you need, pre-compiled.
 
-[Releases]: https://github.com/alex-ball/beamerticle/releases
+[Releases]: https://github.com/alex-ball/beamerswitch/releases
 
 ### Automated way
 
@@ -40,13 +40,13 @@ To install the class from scratch, follow these instructions. If you have
 downloaded the zip file from the [Releases] page on GitHub, you can skip the
 first two steps.
 
- 1. Process `beamerticle.dtx` with your favourite version of LaTeX with shell
+ 1. Process `beamerswitch.dtx` with your favourite version of LaTeX with shell
     escape enabled (as required by `minted` for typesetting the listings). You
     will also need to run it through `makeindex`. This will generate the class
     file and the main documentation (DVI or PDF), plus an example file
-    `beamerticle-example.tex`.
+    `beamerswitch-example.tex`.
 
- 2. Process `beamerticle-example.tex` with your favourite version of LaTeX. If
+ 2. Process `beamerswitch-example.tex` with your favourite version of LaTeX. If
     you enable shell escape and have `latexmk` installed you will end up with
     another four documents (DVI or PDF). Otherwise you will get one.
 
@@ -54,22 +54,22 @@ first two steps.
     and copy the files across as shown (read `.pdf` as `.dvi` if that is what
     you generated):
 
-     * `source/latex/beamerticle`:
-       `beamerticle.dtx`,
-       (`beamerticle.ins`)
-     * `tex/latex/beamerticle`:
-       `beamerticle.cls`
-     * `doc/latex/beamerticle`:
-       `beamerticle.pdf`,
-       `beamerticle-example.tex`,
-       `beamerticle-example.pdf`,
-       `beamerticle-example-article.pdf`,
-       `beamerticle-example-handout.pdf`,
-       `beamerticle-example-trans.pdf`
+     * `source/latex/beamerswitch`:
+       `beamerswitch.dtx`,
+       (`beamerswitch.ins`)
+     * `tex/latex/beamerswitch`:
+       `beamerswitch.cls`
+     * `doc/latex/beamerswitch`:
+       `beamerswitch.pdf`,
+       `beamerswitch-example.tex`,
+       `beamerswitch-example.pdf`,
+       `beamerswitch-example-article.pdf`,
+       `beamerswitch-example-handout.pdf`,
+       `beamerswitch-example-trans.pdf`
 
 ## Licence
 
-This work consists of the file beamerticle.dtx and a Makefile.
+This work consists of the file beamerswitch.dtx and a Makefile.
 
 This work may be distributed and/or modified under the conditions of the
 [LaTeX Project Public License (LPPL)](http://www.latex-project.org/lppl.txt),
