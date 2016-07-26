@@ -8,8 +8,8 @@
 This class is a wrapper around the `beamer` class to make it easier to use the
 same document to generate the different forms of the presentation: the slides
 themselves, an abbreviated slide set for transparencies or online reference,
-an n-up handout version, but most significantly a transcript or set of notes
-using the `article` class.
+an n-up handout version, and a transcript or set of notes using the `article`
+class.
 
 ## Installation
 
@@ -21,7 +21,7 @@ package for details.
 
 There is an example file that demonstrates the features of the class.
 The class itself depends only on packages easily available through TeX
-distributions and CTAN. One feature relies on `latexmk` though you could work
+distributions and CTAN. One feature relies on `latexmk` though you can work
 around that if you have the patience.
 
 Note that the zip file on the [Releases] page on GitHub contains all the files
@@ -87,7 +87,8 @@ This work is "maintained" (as per LPPL maintenance status) by
 %<*example>
 \PassOptionsToClass{a4paper,12pt}{article}
 \PassOptionsToClass{14pt}{beamer}
-\documentclass[also={trans,handout,article},nup=3]{beamerswitch}
+\documentclass[also={trans,handout,article}]{beamerswitch}
+\handoutlayout{nup=3}
 \usepackage[british]{babel}
 \mode<article>{
   \usepackage[hmargin=3cm,vmargin=2.5cm]{geometry}
@@ -465,8 +466,8 @@ Copyright (C) 2015 by Alex Ball <a.ball@ukoln.ac.uk>
 This class is a wrapper around the \pkg{beamer} class to make it easier to use the
 same document to generate the different forms of the presentation: the slides
 themselves, an abbreviated slide set for transparencies or online reference,
-an n-up handout version, but most significantly a transcript or set of notes
-using the \pkg{article} class.
+an n-up handout version, and a transcript or set of notes using the \pkg{article}
+class.
 
 To contact the author about this package, please visit the GitHub
 page where the code is hosted: \url{https://github.com/alex-ball/beamerswitch}.
@@ -524,23 +525,22 @@ is set free-flowing in \key{article} mode, without any of the frame furniture.
 
 The \pkg{beamer} manual suggests coping with all these variations by having the
 document code in one file, and using it as input to other files that each set up
-a different mode of operation. This is fine but a bit of a fiddle. Could it be
-possible to get slides, an article and a handout all from a single run of, say,
-\pkg{latexmk}?
+a different mode of operation. This is fine but a bit of a fiddle. It would be
+nice to be able to get the same effect using a single file and, ideally, a
+single command invocation.
 
-This class is intended as a wrapper around these various options, to simplify
-the matter of switching between them in a single document. More specifically, it
-has three main functions:
+The \pkg{beamerswitch} class addresses this issue by acting as a wrapper around
+the various options, and providing a common interface for switching between
+modes. More specifically, it has three main functions:
 
 \begin{enumerate}
 \item
-  To make it easier, within the same document, to switch between using the
-  \pkg{beamer} class and the \pkg{article} class (plus \pkg{beamerarticle}
-  package). This includes adding a little more of what \pkg{beamer} does to the
-  \pkg{article} class than does the \pkg{beamerarticle} package.
+  To provide more choice of handout-mode layouts than \pkg{pgfpages} gives you
+  out-of-the-box, and a potentially more memorable way of selecting them.
 \item
-  To offer more choice of handout-mode layouts than \pkg{pgfpages} gives you
-  out-of-the-box, and to make them easier to select.
+  To enable you to switch to \key{article} mode with a simple change of class
+  option, instead of having to fiddle with commented-out \cs{documentclass} and
+  \cs{usepackage} lines.
 \item
   To allow you to override the \pkg{beamer} mode from the command line, by
   choosing a given jobname suffix. Primarily this is to allow you to generate
@@ -570,9 +570,7 @@ distributions.
 One feature of the class uses \pkg{latexmk} by default, though you can configure
 it to use something else if you need or want to.
 
-\section{Usage}
-
-\subsection{Loading the class}
+\section{Loading the class}
 
 The class is loaded in the usual way:
 
@@ -586,7 +584,9 @@ The various options are described below.
 
 The \pkg{beamerswitch} class, as explained above, does not do much itself but
 rather helps you to switch between \pkg{beamer} modes, specifically
-\key{article}, \key{beamer}, \key{trans} and \key{handout}.
+\key{article}, \key{beamer}, \key{trans} and \key{handout}. Note that it loads
+\pkg{beamer} with the \key{ignorenonframetext} option, so that text outside
+frames is only shown in \key{article} mode.
 
 The normal way of choosing the mode is to use the respective class options.
 
@@ -650,8 +650,9 @@ suffixes are provided by the following commands:
   Holds the \cs{jobname} suffix that triggers \key{trans} mode.
 \end{docCommand}
 
-The CamelCase is an admittedly rather obscure signal to you to define the suffix
-before loading the class:
+The CamelCase is an admittedly rather obscure signal to you that, if you want to
+change them to something else, you should do so via \cs{newcommand} before
+loading the class:
 
 \begin{dispListing}
 \newcommand*{\ArticleSuffix}{-script}
@@ -708,39 +709,31 @@ before loading the class:
 \documentclass{beamerswitch}
 \end{dispListing}
 
-\subsection{Customizing the modes}
+\section{Setting the layout of the handouts}
 
-There are a few ways of customizing the behaviour of the various modes.
+The class provides a simplified interface to the \pkg{pgfpages} package. By
+default, it prints six slides to a side of A4 paper, but you can change by
+using the following command in the preamble.
 
-You can use the standard \LaTeX\ methods for customizing how the \pkg{article}
-and \pkg{beamer} classes are loaded:
+\begin{docCommand}{handoutlayout}{\marg{options}}
+  Configures the layout of the page when using \key{handout} mode. It has no
+  effect in other modes. The available \meta{options} are listed below.
+\end{docCommand}
 
-\begin{dispListing}
-\PassOptionsToClass{a4paper,11pt}{article} % for article mode
-\PassOptionsToClass{utf8}{beamer} % for beamer, handout, trans modes
-\documentclass{beamerswitch}
-\end{dispListing}
-
-And of course there is the standard \pkg{beamer} way of passing different
-options to different modes:
-
-\begin{dispListing}
-\documentclass{beamerswitch}
-\mode<article>{
-  \usepackage[utf8]{inputenc}
-}
-\mode<handout>{
-  \usecolortheme{dove}
-}
-\end{dispListing}
-
-The \pkg{beamerswitch} class also provides a limited number of options itself.
-
-\begin{docKey}{handoutpaper}{=\meta{paper size}}{default \val{a4paper}, initially \val{a4paper}}
+\begin{docKey}{paper}{=\meta{paper size}}{no default, initially \val{a4paper}}
   Selects the size of paper to use for \key{handout} mode. The value is passed
   directly to \pkg{pgfpages}, so consult the documentation of that package for
   the allowed values. You can find them under the documentation for the
   \key{resize to} layout.
+\end{docKey}
+
+\begin{docKey}{nup}{=\val{2}\textbar \val{3}\textbar \val{3plus}\textbar \val{4}\textbar \val{4plus}\textbar \val{6}\textbar \val{8}}{no default, initially \val{6}}
+  Selects how many slides are shown on a single page in \key{handout} mode.
+  The `plus' layouts leave blank space for recipients to make handwritten notes
+  next to each slide. The effects of the various values are shown in Figure~\ref{fig:layouts} on page~\pageref{fig:layouts}. Note that the \val{2},
+  \val{3plus}, \val{4} and \val{6} layouts are intended for slides in the usual
+  4:3 aspect ratio, while the \val{3}, \val{4plus} and \val{8} layouts are
+  intended for widescreen slides.
 \end{docKey}
 
 \newtcolorbox{pseudopage}[1][]%
@@ -754,12 +747,23 @@ The \pkg{beamerswitch} class also provides a limited number of options itself.
   ,colback=yellow!5
   ,#1
 }
-
 \newtcolorbox{pseudoslide}[1][]%
 {nobeforeafter
   ,width=3em
   ,halign=flush center
   ,height=2.25em
+  ,valign=center
+  ,size=fbox
+  ,boxrule=0.5mm
+  ,colframe=ExampleFrame
+  ,colback=ExampleBack
+  ,#1
+}
+\newtcolorbox{pseudowideslide}[1][]%
+{nobeforeafter
+  ,width=3em
+  ,halign=flush center
+  ,height=1.69em
   ,valign=center
   ,size=fbox
   ,boxrule=0.5mm
@@ -784,6 +788,24 @@ The \pkg{beamerswitch} class also provides a limited number of options itself.
   \end{minipage}
   \begin{minipage}[b]{11em}
     \centering
+    \begin{pseudopage}
+      \begin{pseudowideslide}[width=4.89em,height=2.75em]
+        \texttt{1}
+      \end{pseudowideslide}
+      \par\smallskip
+      \begin{pseudowideslide}[width=4.89em,height=2.75em]
+        \texttt{2}
+      \end{pseudowideslide}
+      \par\smallskip
+      \begin{pseudowideslide}[width=4.89em,height=2.75em]
+        \texttt{3}
+      \end{pseudowideslide}
+    \end{pseudopage}
+    \par
+    (b) \key{nup}=\val{3}
+  \end{minipage}
+  \begin{minipage}[b]{11em}
+    \centering
     \begin{pseudopage}[halign=flush left]
       \begin{pseudoslide}\texttt{1}\end{pseudoslide}
       \par\medskip
@@ -792,7 +814,7 @@ The \pkg{beamerswitch} class also provides a limited number of options itself.
       \begin{pseudoslide}\texttt{3}\end{pseudoslide}
     \end{pseudopage}
     \par
-    (b) \key{nup}=\val{3}
+    (b) \key{nup}=\val{3plus}
   \end{minipage}
   \par\bigskip
   \begin{minipage}[b]{11em}
@@ -816,6 +838,20 @@ The \pkg{beamerswitch} class also provides a limited number of options itself.
   \end{minipage}
   \begin{minipage}[b]{11em}
     \centering
+    \begin{pseudopage}[halign=flush left]
+      \begin{pseudowideslide}\texttt{1}\end{pseudowideslide}
+      \par\medskip
+      \begin{pseudowideslide}\texttt{2}\end{pseudowideslide}
+      \par\medskip
+      \begin{pseudowideslide}\texttt{3}\end{pseudowideslide}
+      \par\medskip
+      \begin{pseudowideslide}\texttt{4}\end{pseudowideslide}
+    \end{pseudopage}
+    \par
+    (d) \key{nup}=\val{4plus}
+  \end{minipage}
+  \begin{minipage}[b]{11em}
+    \centering
     \begin{pseudopage}
       \begin{pseudoslide}\texttt{1}\end{pseudoslide}
       \begin{pseudoslide}\texttt{2}\end{pseudoslide}
@@ -829,48 +865,110 @@ The \pkg{beamerswitch} class also provides a limited number of options itself.
     \par
     (d) \key{nup}=\val{6}
   \end{minipage}
+  \par\bigskip
+  \begin{minipage}[b]{11em}
+    \centering
+    \begin{pseudopage}
+      \begin{pseudowideslide}\texttt{1}\end{pseudowideslide}
+      \begin{pseudowideslide}\texttt{2}\end{pseudowideslide}
+      \par\medskip
+      \begin{pseudowideslide}\texttt{3}\end{pseudowideslide}
+      \begin{pseudowideslide}\texttt{4}\end{pseudowideslide}
+      \par\medskip
+      \begin{pseudowideslide}\texttt{5}\end{pseudowideslide}
+      \begin{pseudowideslide}\texttt{6}\end{pseudowideslide}
+      \par\medskip
+      \begin{pseudowideslide}\texttt{7}\end{pseudowideslide}
+      \begin{pseudowideslide}\texttt{8}\end{pseudowideslide}
+    \end{pseudopage}
+    \par
+    (d) \key{nup}=\val{8}
+  \end{minipage}
   \par
   \caption{Handout layouts provided by \pkg{beamerswitch}}
   \label{fig:layouts}
 \end{figure}
 
-\begin{docKey}{nup}{=\val{2}\textbar \val{3}\textbar \val{4}\textbar \val{6}}{default \val{6}, initially \val{6}}
-  Selects how many slides are shown on a single page in \key{handout} mode.
-  The effects of the four possible values are shown in Figure~\ref{fig:layouts}.
-  The layouts for 2 and 4 slides are very similar to the layouts provided as
-  standard by \pkg{pgfpages}, except a thin border is added around the slides
-  (and, as a side effect, any `gaps' at the end of the slide set). The layouts
-  for 3 and 6 slides are not available as standard in \pkg{pgfpages}; they also
-  put thin borders around the slides.
+\begin{docKey}{borders}{}{no value, initially unset}
+  Puts a thin rectangular border around each slide. Note that the borders are
+  drawn regardless of whether a slide is actually printed, so you may end up
+  with empty boxes on the last page.
 \end{docKey}
 
-\begin{docKey}{articleframetitles}{=\val{para}\textbar\val{margin}\textbar\val{none}}{default \val{para}, initially \val{none}}
-  Affects how frame titles are printed in \key{article} mode. The initial value
-  \docValue{none} removes them entirely. To have them printed as
-  \pkg{beamerarticle} normally does (as paragraph headings), use
-  \docValue{para} or pass the option without a value. To have them printed in
-  the margin, use \docValue{margin}.
+\begin{docKey}{pnos}{}{no value, initially unset}
+  Adds page numbers to the bottom of each page.
 \end{docKey}
 
-\subsection{Other features}
+\section{Applying patches and fixes}
 
-There are a few other things that \pkg{beamerswitch} does that you should be
-aware of, in case it causes any issues.
+Some additional options can be set by using the following command in the
+preamble.
 
-In \key{article} mode, \pkg{beamerswitch} adjusts the \cs{maketitle} routine so
-that the title is printed closer to the top margin. The subtitle is shown joined
-to the title using a colon. The institute is shown directly beneath the author
-name, similar to the \pkg{beamer} layout. You can use \cs{inst} just as in
-\pkg{beamer} to tie authors to institutes, and \pkg{beamerswitch} uses text
-superscript instead of maths superscript for this (in all four modes).
+\begin{docCommand}{bsoptions}{\marg{options}}
+  Applies certain patches to the \pkg{beamer} and \pkg{article} classes. The
+  available \meta{options} are listed below.
+\end{docCommand}
 
-Also in \key{article} mode, \pkg{beamerswitch} loads \pkg{hyperref} for you, and
-ensures that \cs{title}, \cs{author}, \cs{subject}, and \cs{keywords} all add
-their values to the PDF metadata, to achieve parity with the presentation modes.
+\begin{docKey}{nohyperref}{}{no value, initially unset}
+  The \pkg{beamer} class loads \pkg{hyperref} for you, but when you switch to \key{article} mode, \pkg{beamerarticle} doesn't, so it is easy for you to get
+  caught out. To protect you from this, \pkg{beamerswitch} \emph{does} load
+  \pkg{hyperref} in \key{article} mode, with the pleasing side effect that
+  \cs{subject}, and \cs{keywords} then work as intended instead of throwing
+  errors. It also happens that \pkg{beamer} puts the arguments of \cs{title},
+  \cs{subtitle}, and \cs{author} in the PDF metadata, but \pkg{beamerarticle}
+  doesn't. To achieve greater parity, \pkg{beamerswitch} \emph{does}.
+  
+  \medskip
+  If you would rather \pkg{beamerswitch} did not apply these fixes, you can
+  switch them off with this option.
+\end{docKey}
 
-In the presentation modes, \pkg{beamerswitch} loads \pkg{beamer} with the
-\key{ignorenonframetext} option, so that text outside frames is only shown in
-\key{article} mode.
+\begin{docKey}{maketitle}{}{no value, initially unset}
+  In \key{article} mode, adjusts the \cs{maketitle} routine. The title is
+  printed closer to the top margin. The subtitle is shown joined to the title
+  using a colon (rather than on a new line). The institute is shown directly
+  beneath the author name, similar to the \pkg{beamer} layout, and you can use
+  \cs{inst} just as in \pkg{beamer} to tie authors to institutes.
+\end{docKey}
+
+\begin{docKey}{textinst}{}{no value, initially unset}
+  In all modes, patches the \cs{inst} command so that it prints its argument
+  using \cs{textsuperscript} instead of a mathematical superscript. This helps
+  avoid unnecessary font changes.
+\end{docKey}
+
+\begin{docKey}{frametitles}{=\val{para}\textbar\val{margin}\textbar\val{none}}{no default, initially \val{para}}
+  In \key{article} mode, affects how frame titles are printed. By default,
+  \pkg{beamerarticle} prints them as paragraph headings; this is represented by
+  the value \docValue{para}. To have them printed in the margin, use
+  \docValue{margin}. To omit them altogether, use the value \docValue{none}.
+\end{docKey}
+
+\section{Tips for further configuration}
+
+There are some other ways to customize the behaviour of the various modes.
+
+You can use the standard \LaTeX\ methods for customizing how the \pkg{article}
+and \pkg{beamer} classes are loaded:
+
+\begin{dispListing}
+\PassOptionsToClass{a4paper,11pt}{article} % for article mode
+\PassOptionsToClass{utf8}{beamer} % for beamer, handout, trans modes
+\documentclass{beamerswitch}
+\end{dispListing}
+
+And of course there is the standard \pkg{beamer} way of passing different
+options to different modes:
+
+\begin{dispListing}
+\documentclass{beamerswitch}
+\mode<article>{
+  \usepackage[utf8]{inputenc}
+}
+\mode<beamer>{
+  \setbeameroption{second mode text on second screen}
+}
+\end{dispListing}
 
 \section{Feedback}
 

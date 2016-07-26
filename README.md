@@ -3,8 +3,8 @@
 This class is a wrapper around the `beamer` class to make it easier to use the
 same document to generate the different forms of the presentation: the slides
 themselves, an abbreviated slide set for transparencies or online reference,
-an n-up handout version, but most significantly a transcript or set of notes
-using the `article` class.
+an n-up handout version, and a transcript or set of notes using the `article`
+class.
 
 ## Installation
 
@@ -16,7 +16,7 @@ package for details.
 
 There is an example file that demonstrates the features of the class.
 The class itself depends only on packages easily available through TeX
-distributions and CTAN. One feature relies on `latexmk` though you could work
+distributions and CTAN. One feature relies on `latexmk` though you can work
 around that if you have the patience.
 
 Note that the zip file on the [Releases] page on GitHub contains all the files
