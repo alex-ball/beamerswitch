@@ -728,6 +728,12 @@ before loading the class:
   metadata fixes should still work.
 \end{docKey}
 
+\begin{docKey}{textinst}{}{no value, initially unset}
+  In all modes, patches the \cs{inst} command so that it prints its argument
+  using \cs{textsuperscript} instead of a mathematical superscript. This helps
+  avoid unnecessary font changes.
+\end{docKey}
+
 \section{Setting the layout of the handouts}
 
 The class provides a simplified interface to the \pkg{pgfpages} package. By
@@ -936,12 +942,6 @@ preamble.
   \cs{inst} just as in \pkg{beamer} to tie authors to institutes.
 \end{docKey}
 
-\begin{docKey}{textinst}{}{no value, initially unset}
-  In all modes, patches the \cs{inst} command so that it prints its argument
-  using \cs{textsuperscript} instead of a mathematical superscript. This helps
-  avoid unnecessary font changes.
-\end{docKey}
-
 \begin{docKey}{frametitles}{=\val{para}\textbar\val{margin}\textbar\val{none}}{no default, initially \val{para}}
   In \key{article} mode, affects how frame titles are printed. By default,
   \pkg{beamerarticle} prints them as paragraph headings; this is represented by
@@ -1121,6 +1121,15 @@ suggestions for improvements or new features to the
 %    \end{macrocode}
 % \end{optionkey}
 %
+% \begin{optionkey}{textinst}
+% The \key{textinst} option adjusts the superscript used for institution
+% markers.
+%
+%    \begin{macrocode}
+\define@boolkey[DC]{beamerswitch}{textinst}[true]{}
+%    \end{macrocode}
+% \end{optionkey}
+%
 % The default behaviour is to use beamer mode only.
 %
 %    \begin{macrocode}
@@ -1287,6 +1296,18 @@ suggestions for improvements or new features to the
     }%
   }
 }
+%    \end{macrocode}
+%
+% \subsection{Mode-independent layout}
+%
+% We implement the option that formats institution markers in text mode rather
+% than math mode.
+%
+%    \begin{macrocode}
+\ifbool{DC@beamerswitch@textinst}{%
+  \def\beamer@insttitle##1{\textsuperscript{##1}}
+  \def\beamer@instinst##1{\textsuperscript{##1}\ignorespaces}
+}{}
 %    \end{macrocode}
 %
 % \subsection{Handout layout}
@@ -2079,16 +2100,6 @@ suggestions for improvements or new features to the
 %    \begin{macrocode}
 \newcommand{\bsoptions}[1]{%
   \setkeys[BO]{beamerswitch}{#1}%
-%    \end{macrocode}
-%
-% It looks odd to have the \cs{inst} markers from \pkg{beamer} in the maths
-% font, so we replace those definitions with something more in keeping.
-%
-%    \begin{macrocode}
-  \ifbool{BO@beamerswitch@textinst}{%
-    \def\beamer@insttitle##1{\textsuperscript{##1}}
-    \def\beamer@instinst##1{\textsuperscript{##1}\ignorespaces}
-  }{}
 %    \end{macrocode}
 %
 % The following options are mode specific.
