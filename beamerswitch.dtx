@@ -89,7 +89,7 @@ This work is "maintained" (as per LPPL maintenance status) by
 \PassOptionsToClass{14pt}{beamer}
 \documentclass[also={trans,handout,article}]{beamerswitch}
 \handoutlayout{nup=3plus,border=1pt}
-\bsoptions{maketitle,frametitles=none}
+\articlelayout{maketitle,frametitles=none}
 \usepackage[british]{babel}
 \mode<article>{
   \usepackage[hmargin=3cm,vmargin=2.5cm]{geometry}
@@ -107,7 +107,7 @@ This work is "maintained" (as per LPPL maintenance status) by
 \author{Alex Ball}
 \institute{University of Life}
 \date{1 September 2016}
-\subject{A LaTeX package}
+\subject{A LaTeX class}
 \keywords{CTAN, literate programming}
 
 \begin{document}
@@ -537,7 +537,8 @@ modes. More specifically, it has three main functions:
 \begin{enumerate}
 \item
   To provide more choice of handout-mode layouts than \pkg{pgfpages} gives you
-  out-of-the-box, and a potentially more memorable way of selecting them.
+  out-of-the-box. Additionally, I hope you will find the method for selecting
+  them more memorable.
 \item
   To enable you to switch to \key{article} mode with a simple change of class
   option, instead of having to fiddle with commented-out \cs{documentclass} and
@@ -700,8 +701,9 @@ command that does the business is this:
   Runs \pkg{latexmk} with \meta{suffix} appended to the \cs{jobname}.
 \end{docCommand}
 
-Again, if you want to pre-define this to do something else, you have to do it
-before loading the class:
+See the \hyperref[sec:implementation]{Implementation} section below for the
+default definition. Again, if you want to pre-define this to do something else,
+you have to do it before loading the class:
 
 \begin{dispListing}
 \newcommand{\BeamerswitchSpawn}[1]{%
@@ -717,15 +719,12 @@ before loading the class:
   caught out. To protect you from this, \pkg{beamerswitch} \emph{does} load
   \pkg{hyperref} in \key{article} mode, with the pleasing side effect that
   \cs{subject} and \cs{keywords} then work as intended instead of throwing
-  errors. It also happens that \pkg{beamer} puts the arguments of \cs{title},
-  \cs{subtitle}, and \cs{author} in the PDF metadata, but \pkg{beamerarticle}
-  doesn't. To achieve greater parity, \pkg{beamerswitch} \emph{does}.
-  
+  errors.
+
   \medskip
   To achieve this, the class has to load \pkg{hyperref} quite early on, which
   can cause trouble with certain other packages. If you would rather
-  load \pkg{hyperref} yourself at a different point, use this option. The
-  metadata fixes should still work.
+  load \pkg{hyperref} yourself at a different point, use this option.
 \end{docKey}
 
 \begin{docKey}{textinst}{}{no value, initially unset}
@@ -737,7 +736,7 @@ before loading the class:
 \section{Setting the layout of the handouts}
 
 The class provides a simplified interface to the \pkg{pgfpages} package. By
-default, it prints six slides to a side of A4 paper, but you can change by
+default, it prints six slides to a side of A4 paper, but you can change this by
 using the following command in the preamble.
 
 \begin{docCommand}{handoutlayout}{\marg{options}}
@@ -796,7 +795,7 @@ using the following command in the preamble.
   ,colback=ExampleBack
   ,#1
 }
-\begin{figure}
+\begin{figure}[t!]
   \centering
   \begin{minipage}[b]{11em}
     \centering
@@ -839,7 +838,7 @@ using the following command in the preamble.
       \begin{pseudoslide}\texttt{3}\end{pseudoslide}
     \end{pseudopage}
     \par
-    (b) \key{nup}=\val{3plus}
+    (c) \key{nup}=\val{3plus}
   \end{minipage}
   \par\bigskip
   \begin{minipage}[b]{11em}
@@ -859,7 +858,7 @@ using the following command in the preamble.
       \end{pseudoslide}
     \end{pseudopage}
     \par
-    (c) \key{nup}=\val{4}
+    (d) \key{nup}=\val{4}
   \end{minipage}
   \begin{minipage}[b]{11em}
     \centering
@@ -873,7 +872,7 @@ using the following command in the preamble.
       \begin{pseudowideslide}\texttt{4}\end{pseudowideslide}
     \end{pseudopage}
     \par
-    (d) \key{nup}=\val{4plus}
+    (e) \key{nup}=\val{4plus}
   \end{minipage}
   \begin{minipage}[b]{11em}
     \centering
@@ -888,7 +887,7 @@ using the following command in the preamble.
       \begin{pseudoslide}\texttt{6}\end{pseudoslide}
     \end{pseudopage}
     \par
-    (d) \key{nup}=\val{6}
+    (f) \key{nup}=\val{6}
   \end{minipage}
   \par\bigskip
   \begin{minipage}[b]{11em}
@@ -907,7 +906,7 @@ using the following command in the preamble.
       \begin{pseudowideslide}\texttt{8}\end{pseudowideslide}
     \end{pseudopage}
     \par
-    (d) \key{nup}=\val{8}
+    (g) \key{nup}=\val{8}
   \end{minipage}
   \par
   \caption{Handout layouts provided by \pkg{beamerswitch}}
@@ -924,7 +923,7 @@ using the following command in the preamble.
   Adds page numbers to the bottom of each page.
 \end{docKey}
 
-\section{Applying patches and fixes}
+\section{Changing the look of article mode}
 
 Some additional options can be set by using the following command in the
 preamble.
@@ -987,7 +986,7 @@ suggestions for improvements or new features to the
 }
 
 \newpage
-\section{Implementation}
+\section{Implementation}\label{sec:implementation}
 
 \setcounter{FancyVerbLine}{18}%
 \DocInput{\jobname.dtx}
@@ -1020,8 +1019,8 @@ suggestions for improvements or new features to the
 %
 % \subsection{Class options}
 %
-% We recognize four main modes of operation: `beamer', `trans', `handout' (with
-% a given number of slides per page) and `article'.
+% We recognize four main modes of operation: `beamer', `trans', `handout', and
+% `article'.
 %
 % \begin{optionkey}{beamer}
 % The \key{beamer} option triggers beamer mode.
@@ -1250,12 +1249,13 @@ suggestions for improvements or new features to the
 % properties, \pkg{beamerarticle} misses the title and author properties. (It
 % does manage to set the subject and keywords, though.) We achieve parity with
 % some additional \cs{hypersetup}. Note that \pkg{beamerarticle} appends the
-% subtitle to \cs{@title} with a linebreak; we adjust this so that a colon is
-% used instead.
+% subtitle to \cs{@title} with a linebreak and this does odd things in the
+% context of \key{pdftitle}, so we fix it with \cs{pdfstringdefDisableCommands}.
 %
 %    \begin{macrocode}
   \AtBeginDocument{%
     \@ifpackageloaded{hyperref}{%
+      \pdfstringdefDisableCommands{\def\\<#1>#2{ - #2}}
       \begingroup
       \hypersetup{pdftitle={\@title}}%
       \def\and{\unskip, }%
@@ -1383,7 +1383,7 @@ suggestions for improvements or new features to the
   }
 %    \end{macrocode}
 %
-% The `1 by 3' layout is similar to the `1 by 3', but with an extra row.
+% The `1 by 3' layout is similar to the `1 by 2', but with an extra row.
 %
 %    \begin{macrocode}
   \pgfpagesdeclarelayout{1 by 3}
@@ -1457,8 +1457,8 @@ suggestions for improvements or new features to the
   }
 %    \end{macrocode}
 %
-% The `1 by 3 narrow' layout is like the `1 by 3' but restricted to left (or
-% top) half of the page.
+% The `1 by 3 narrow' layout is like the `1 by 3' layout but restricted to the
+% left (or top) half of the page.
 %
 %    \begin{macrocode}
   \pgfpagesdeclarelayout{1 by 3 narrow}
@@ -2051,23 +2051,14 @@ suggestions for improvements or new features to the
 \handoutlayout{paper=a4paper,nup=6}
 %    \end{macrocode}
 %
-% \subsection{Patches and fixes}
+% \subsection{Article layout}
 %
 % \begin{optionkey}{maketitle}
 % The \key{maketitle} option triggers adjustments in how the title block is
 % printed in article mode.
 %
 %    \begin{macrocode}
-\define@boolkey[BO]{beamerswitch}{maketitle}[true]{}
-%    \end{macrocode}
-% \end{optionkey}
-%
-% \begin{optionkey}{textinst}
-% The \key{textinst} option adjusts the superscript used for institution
-% markers.
-%
-%    \begin{macrocode}
-\define@boolkey[BO]{beamerswitch}{textinst}[true]{}
+\define@boolkey[AL]{beamerswitch}{maketitle}[true]{}
 %    \end{macrocode}
 % \end{optionkey}
 %
@@ -2084,7 +2075,7 @@ suggestions for improvements or new features to the
 % \end{itemize}
 %
 %    \begin{macrocode}
-\define@choicekey+[BO]{beamerswitch}{frametitles}{para, margin, none}{%
+\define@choicekey+[AL]{beamerswitch}{frametitles}{para, margin, none}{%
   \def\beamerswitch@articleframetitles{#1}%
 }{%
   \ClassWarning{beamerswitch}{Value of `frametitles' not recognized.
@@ -2142,9 +2133,9 @@ suggestions for improvements or new features to the
 % does not end in conflicting punctuation.
 %
 %    \begin{macrocode}
-    \ifbool{BO@beamerswitch@maketitle}{%
+    \ifbool{AL@beamerswitch@maketitle}{%
       \renewcommand{\subtitle}[2][]{%
-        \def\insertsubtitle{##2}\g@addto@macro\@title{: ##2}%
+        \def\insertsubtitle{##2}\gappto\@title{: ##2}%
       }
 %    \end{macrocode}
 %
@@ -2193,6 +2184,24 @@ suggestions for improvements or new features to the
         \end{center}%
         \par\vskip 1.5em%
       }%
+    }{}%
+  }%
+%    \end{macrocode}
+%
+% For consistency, if the \key{maketitle} option has been passed, we change the
+% PDF metadata in the other modes to use the colon convention for joining the
+% title and subtitle.
+%
+%    \begin{macrocode}
+  \mode<presentation>{%
+    \ifbool{AL@beamerswitch@maketitle}{%
+      \ifbool{beamer@autopdfinfo}{%
+        \patchcmd{\beamer@firstminutepatches}{%
+          \inserttitle\ifx\insertsubtitle\@empty\else\ - \insertsubtitle\fi
+        }{%
+          \inserttitle\ifx\insertsubtitle\@empty\else: \insertsubtitle\fi
+        }{}{}%
+      }{}%
     }{}%
   }%
 }
