@@ -929,9 +929,9 @@ using the following command in the preamble.
 Some additional options can be set by using the following command in the
 preamble.
 
-\begin{docCommand}{bsoptions}{\marg{options}}
-  Applies certain patches to the \pkg{beamer} and \pkg{article} classes. The
-  available \meta{options} are listed below.
+\begin{docCommand}{articlelayout}{\marg{options}}
+  Configures the appearance of \key{article} mode. It is safe to use in other
+  modes. The available \meta{options} are listed below.
 \end{docCommand}
 
 \begin{docKey}{maketitle}{}{no value, initially unset}
@@ -2094,12 +2094,12 @@ suggestions for improvements or new features to the
 % \end{macro}
 % \end{optionkey}
 %
-% \begin{macro}{bsoptions}
+% \begin{macro}{articlelayout}
 % We set up a command for setting these options.
 %
 %    \begin{macrocode}
-\newcommand{\bsoptions}[1]{%
-  \setkeys[BO]{beamerswitch}{#1}%
+\newcommand{\articlelayout}[1]{%
+  \setkeys[AL]{beamerswitch}{#1}%
 %    \end{macrocode}
 %
 % The following options are mode specific.
