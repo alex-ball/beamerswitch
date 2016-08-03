@@ -2085,6 +2085,48 @@ suggestions for improvements or new features to the
 % \end{macro}
 % \end{optionkey}
 %
+% These patches enable us to combine the title and subtitle with a colon,
+% if and only if the title does not already end in clashing punctuation.
+% TODO: Proper documentation; make this solution optional (\key{noexpl3}).
+%
+%    \begin{macrocode}
+\newtoggle{bsw@punct}
+\RequirePackage{xparse}
+\ExplSyntaxOn
+\NewDocumentCommand{\bsw@punct@test}{m}{\l_bsw_punct_test:n { #1 }}
+\cs_new_protected:Nn \l_bsw_punct_test:n
+{
+  \str_if_eq_x:nnTF { \str_item:nn {#1} {-1} } {,}
+  {\global\toggletrue{bsw@punct}}{
+    \str_if_eq_x:nnTF { \str_item:nn {#1} {-1} } {;}
+    {\global\toggletrue{bsw@punct}}{
+      \str_if_eq_x:nnTF { \str_item:nn {#1} {-1} } {:}
+      {\global\toggletrue{bsw@punct}}{
+        \str_if_eq_x:nnTF { \str_item:nn {#1} {-1} } {.}
+        {\global\toggletrue{bsw@punct}}{
+          \str_if_eq_x:nnTF { \str_item:nn {#1} {-1} } {!}
+          {\global\toggletrue{bsw@punct}}{
+            \str_if_eq_x:nnTF { \str_item:nn {#1} {-1} } {?}
+            {\global\toggletrue{bsw@punct}}{}
+          }
+        }
+      }
+    }
+  }
+}
+\ExplSyntaxOff
+\mode<article>{%
+  \renewcommand{\title}[2][]{\bsw@punct@test{#2}\beamer@origtitle{#2}}
+}
+\mode<presentation>{%
+  \long\def\beamer@title[#1]#2{%
+    \def\inserttitle{#2}%
+    \def\beamer@shorttitle{#1}%
+    \bsw@punct@test{#2}%
+  }
+}
+%    \end{macrocode}
+%
 % \begin{macro}{articlelayout}
 % We set up a command for setting these options.
 %
@@ -2129,13 +2171,11 @@ suggestions for improvements or new features to the
 %
 % This is where we make our adjustments to \cs{maketitle}. We start by joining
 % the subtitle to the title by means of a colon instead of a newline.
-% TODO: Make this conditional, so the colon is only added if the the title
-% does not end in conflicting punctuation.
 %
 %    \begin{macrocode}
     \ifbool{AL@beamerswitch@maketitle}{%
       \renewcommand{\subtitle}[2][]{%
-        \def\insertsubtitle{##2}\gappto\@title{: ##2}%
+        \def\insertsubtitle{##2}\gappto\@title{\iftoggle{bsw@punct}{}{:} ##2}%
       }
 %    \end{macrocode}
 %
@@ -2199,7 +2239,7 @@ suggestions for improvements or new features to the
         \patchcmd{\beamer@firstminutepatches}{%
           \inserttitle\ifx\insertsubtitle\@empty\else\ - \insertsubtitle\fi
         }{%
-          \inserttitle\ifx\insertsubtitle\@empty\else: \insertsubtitle\fi
+          \inserttitle\ifx\insertsubtitle\@empty\else\iftoggle{bsw@punct}{}{:} \insertsubtitle\fi
         }{}{}%
       }{}%
     }{}%
