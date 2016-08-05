@@ -934,16 +934,33 @@ preamble.
 \end{docCommand}
 
 \begin{docKey}{maketitle}{}{no value, initially unset}
-  In \key{article} mode, adjusts the \cs{maketitle} routine. The title is
-  printed closer to the top margin. The subtitle is shown joined to the title
-  using a colon (rather than on a new line). The institute is shown directly
-  beneath the author name, similar to the \pkg{beamer} layout, and you can use
-  \cs{inst} just as in \pkg{beamer} to tie authors to institutes.
+  In \key{article} mode, adjusts the \cs{maketitle} routine:
+  \begin{itemize}
+  \item
+    The title is printed closer to the top margin.
+  \item
+    The subtitle is shown joined to the title using a colon (rather than on a
+    new line).
+  \item
+    The institute is shown directly beneath the author name, similar to the
+    \pkg{beamer} layout, so you can use \cs{inst} just as in \pkg{beamer} to tie
+    authors to their affiliations.
+  \end{itemize}
+
+  If you have \pkg{xparse} (and hence \pkg{expl3}) installed, the class will
+  detect cases where your title ends in a character like `?' and will not add a
+  colon to it in that case. You can also suppress the colon manually with the
+  following code (add it \emph{after} using \cs{title} if automatic detection is
+  in effect):
+
+\begin{dispListing}
+\toggletrue{titlepunct}
+\end{dispListing}
 \end{docKey}
 
 \begin{docKey}{frametitles}{=\val{para}\textbar\val{margin}\textbar\val{none}}{no default, initially \val{para}}
   In \key{article} mode, affects how frame titles are printed. By default,
-  \pkg{beamerarticle} prints them as paragraph headings; this is represented by
+  \pkg{beamerarticle} prints them as paragraph headings, represented by
   the value \docValue{para}. To have them printed in the margin, use
   \docValue{margin}. To omit them altogether, use the value \docValue{none}.
 \end{docKey}
@@ -2053,14 +2070,80 @@ suggestions for improvements or new features to the
 %
 % \subsection{Article layout}
 %
+% We provide some options for configuring the appearance of article mode.
+%
 % \begin{optionkey}{maketitle}
 % The \key{maketitle} option triggers adjustments in how the title block is
-% printed in article mode.
+% printed.
 %
 %    \begin{macrocode}
 \define@boolkey[AL]{beamerswitch}{maketitle}[true]{}
 %    \end{macrocode}
 % \end{optionkey}
+%
+% One will be to join the title and subtitle with a colon. There is an edge case
+% where, if the user provides a title that ends in `!' or `?' \emph{and}
+% provides a subtitle while this option is in effect, they will end up with
+% clashing punctuation in the middle of the displayed title (`!:' or `?:'). We
+% therefore introduce a toggle that, if set true, suppresses the additional
+% colon.
+%
+%    \begin{macrocode}
+\newtoggle{titlepunct}
+%    \end{macrocode}
+%
+% \begin{macro}{bsw@punct@test}
+% Of course, we would rather not bother the user with this, so we introduce a
+% command for testing the title for final punctuation.
+%
+% The only way I can seem to do this is by switching to \pkg{expl3} syntax.
+% Rather than introduce extra hard dependencies to cope with what will probably
+% be quite a rare issue, we make the dependency soft: it will only be applied
+% if \pkg{xparse} is available. If there is demand for it, we could introduce
+% a class option to switch this code on or off, but let's see how we go.
+%
+%    \begin{macrocode}
+\IfFileExists{xparse.sty}{\@tempswatrue}{\@tempswafalse}
+\if@tempswa
+  \RequirePackage{xparse}
+  \ExplSyntaxOn
+  \NewDocumentCommand{\bsw@punct@test}{m}{\l_bsw_punct_test:n {#1}}
+  \cs_new_protected:Nn \l_bsw_punct_test:n
+  {
+    \str_case_x:nnTF { \str_item:nn {#1} {-1} }
+      {
+        { , } { }
+        { ; } { }
+        { : } { }
+        { . } { }
+        { ! } { }
+        { ? } { }
+      }
+      { \global\toggletrue{titlepunct} }
+      { \global\togglefalse{titlepunct} }
+  }
+  \ExplSyntaxOff
+%    \end{macrocode}
+%
+% We insert this test into the definitions for \cs{title} introduced by
+% \pkg{beamer}\slash\pkg{beamerarticle}.
+%
+%    \begin{macrocode}
+  \mode<article>{%
+    \renewcommand{\title}[2][]{\beamer@origtitle{#2}\bsw@punct@test{#2}}
+  }
+  \mode<presentation>{%
+    \long\def\beamer@title[#1]#2{%
+      \def\inserttitle{#2}%
+      \def\beamer@shorttitle{#1}%
+      \bsw@punct@test{#2}%
+    }
+  }
+\else
+  \wlog{Beamerswitch: Auto-detection of title punctuation not available.}
+\fi
+%    \end{macrocode}
+% \end{macro}
 %
 % \begin{optionkey}{frametitles}
 % \begin{macro}{beamerswitch@articleframetitles}
@@ -2085,50 +2168,8 @@ suggestions for improvements or new features to the
 % \end{macro}
 % \end{optionkey}
 %
-% These patches enable us to combine the title and subtitle with a colon,
-% if and only if the title does not already end in clashing punctuation.
-% TODO: Proper documentation; make this solution optional (\key{noexpl3}).
-%
-%    \begin{macrocode}
-\newtoggle{bsw@punct}
-\RequirePackage{xparse}
-\ExplSyntaxOn
-\NewDocumentCommand{\bsw@punct@test}{m}{\l_bsw_punct_test:n { #1 }}
-\cs_new_protected:Nn \l_bsw_punct_test:n
-{
-  \str_if_eq_x:nnTF { \str_item:nn {#1} {-1} } {,}
-  {\global\toggletrue{bsw@punct}}{
-    \str_if_eq_x:nnTF { \str_item:nn {#1} {-1} } {;}
-    {\global\toggletrue{bsw@punct}}{
-      \str_if_eq_x:nnTF { \str_item:nn {#1} {-1} } {:}
-      {\global\toggletrue{bsw@punct}}{
-        \str_if_eq_x:nnTF { \str_item:nn {#1} {-1} } {.}
-        {\global\toggletrue{bsw@punct}}{
-          \str_if_eq_x:nnTF { \str_item:nn {#1} {-1} } {!}
-          {\global\toggletrue{bsw@punct}}{
-            \str_if_eq_x:nnTF { \str_item:nn {#1} {-1} } {?}
-            {\global\toggletrue{bsw@punct}}{}
-          }
-        }
-      }
-    }
-  }
-}
-\ExplSyntaxOff
-\mode<article>{%
-  \renewcommand{\title}[2][]{\bsw@punct@test{#2}\beamer@origtitle{#2}}
-}
-\mode<presentation>{%
-  \long\def\beamer@title[#1]#2{%
-    \def\inserttitle{#2}%
-    \def\beamer@shorttitle{#1}%
-    \bsw@punct@test{#2}%
-  }
-}
-%    \end{macrocode}
-%
 % \begin{macro}{articlelayout}
-% We set up a command for setting these options.
+% We provide a command for setting these options.
 %
 %    \begin{macrocode}
 \newcommand{\articlelayout}[1]{%
@@ -2175,7 +2216,7 @@ suggestions for improvements or new features to the
 %    \begin{macrocode}
     \ifbool{AL@beamerswitch@maketitle}{%
       \renewcommand{\subtitle}[2][]{%
-        \def\insertsubtitle{##2}\gappto\@title{\iftoggle{bsw@punct}{}{:} ##2}%
+        \def\insertsubtitle{##2}\gappto\@title{\iftoggle{titlepunct}{}{:} ##2}%
       }
 %    \end{macrocode}
 %
@@ -2239,7 +2280,7 @@ suggestions for improvements or new features to the
         \patchcmd{\beamer@firstminutepatches}{%
           \inserttitle\ifx\insertsubtitle\@empty\else\ - \insertsubtitle\fi
         }{%
-          \inserttitle\ifx\insertsubtitle\@empty\else\iftoggle{bsw@punct}{}{:} \insertsubtitle\fi
+          \inserttitle\ifx\insertsubtitle\@empty\else\iftoggle{titlepunct}{}{:} \insertsubtitle\fi
         }{}{}%
       }{}%
     }{}%
