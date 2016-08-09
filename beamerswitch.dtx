@@ -2244,7 +2244,7 @@ suggestions for improvements or new features to the
           {%
             \large\lineskip .5em%
             \begin{tabular}[t]{c}%
-              \ifundef{\insertauthorurl}{\@author}{\href{\insertauthorurl}{\@author}}%
+              \@author
             \end{tabular}\par
           }%
 %    \end{macrocode}
@@ -2257,11 +2257,11 @@ suggestions for improvements or new features to the
               \normalsize\lineskip .5em%
               \begin{tabular}[t]{c}%
                 \insertinstitute
-              \end{tabular}%
+              \end{tabular}\par
             }%
           }%
-          \par\vskip 1em%
-          {\large \@date \par}%
+          \vskip 1em%
+          {\large \@date}%
         \end{center}%
         \par\vskip 1.5em%
       }%
