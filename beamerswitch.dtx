@@ -698,7 +698,8 @@ other version on a previous run so you have to take care of that yourself. The
 command that does the business is this:
 
 \begin{docCommand}{BeamerswitchSpawn}{\marg{suffix}}
-  Runs \pkg{latexmk} with \meta{suffix} appended to the \cs{jobname}.
+  Spawns a new compilation process with \meta{suffix} appended to the
+  \cs{jobname}.
 \end{docCommand}
 
 See the \hyperref[sec:implementation]{Implementation} section below for the
@@ -754,10 +755,10 @@ using the following command in the preamble.
 \begin{docKey}{nup}{=\val{2}\textbar \val{3}\textbar \val{3plus}\textbar \val{4}\textbar \val{4plus}\textbar \val{6}\textbar \val{8}}{no default, initially \val{6}}
   Selects how many slides are shown on a single page in \key{handout} mode.
   The `plus' layouts leave blank space for recipients to make handwritten notes
-  next to each slide. The effects of the various values are shown in Figure~\ref{fig:layouts} on page~\pageref{fig:layouts}. Note that the \val{2},
-  \val{3plus}, \val{4} and \val{6} layouts are intended for slides in the usual
-  4:3 aspect ratio, while the \val{3}, \val{4plus} and \val{8} layouts are
-  intended for widescreen slides.
+  next to each slide. The effects of the various values are shown in Figure~\ref{fig:layouts} on page~\pageref{fig:layouts}. Note that the \docValue{2},
+  \docValue{3plus}, \docValue{4} and \docValue{6} layouts are intended for
+  slides in the usual 4:3 aspect ratio, while the \docValue{3}, \docValue{4plus}
+  and \docValue{8} layouts are intended for widescreen slides.
 \end{docKey}
 
 \newtcolorbox{pseudopage}[1][]%
@@ -914,9 +915,9 @@ using the following command in the preamble.
 \end{figure}
 
 \begin{docKey}{border}{=\meta{length}}{default 0.4pt, initially 0pt}
-  Puts a thin rectangular border around each slide. Note that the borders are
-  drawn regardless of whether a slide is actually printed, so you may end up
-  with empty boxes on the last page.
+  Puts a rectangular border of thickness \meta{length} around each slide. Note
+  that the borders are drawn regardless of whether a slide is actually printed,
+  so you may end up with empty boxes on the last page.
 \end{docKey}
 
 \begin{docKey}{pnos}{}{no value, initially unset}
@@ -929,7 +930,7 @@ Some additional options can be set by using the following command in the
 preamble.
 
 \begin{docCommand}{articlelayout}{\marg{options}}
-  Configures the appearance of \key{article} mode. It is safe to use in other
+  Configures the appearance of \key{article} mode. It has no effect in other
   modes. The available \meta{options} are listed below.
 \end{docCommand}
 
@@ -961,8 +962,9 @@ preamble.
 \begin{docKey}{frametitles}{=\val{para}\textbar\val{margin}\textbar\val{none}}{no default, initially \val{para}}
   In \key{article} mode, affects how frame titles are printed. By default,
   \pkg{beamerarticle} prints them as paragraph headings, represented by
-  the value \docValue{para}. To have them printed in the margin, use
-  \docValue{margin}. To omit them altogether, use the value \docValue{none}.
+  the value \docValue{para}. To have them printed in the margin (using
+  \cs{marginpar}), use \docValue{margin}. To omit them altogether, use the value
+  \docValue{none}.
 \end{docKey}
 
 \section{Tips for further configuration}
@@ -1129,8 +1131,8 @@ suggestions for improvements or new features to the
 % \end{optionkey}
 %
 % \begin{optionkey}{nohyperref}
-% The \key{nohyperref} option blocks the class from applying
-% \pkg{hyperref}-related fixes in article mode.
+% The \key{nohyperref} option stops the class from loading the \pkg{hyperref}
+% package in article mode.
 %
 %    \begin{macrocode}
 \define@boolkey[DC]{beamerswitch}{nohyperref}[true]{}
@@ -1982,6 +1984,13 @@ suggestions for improvements or new features to the
 % \end{optionkey}
 %
 % \begin{optionkey}{nup}
+% \begin{optionvalue}{2}
+% \begin{optionvalue}{3}
+% \begin{optionvalue}{3plus}
+% \begin{optionvalue}{4}
+% \begin{optionvalue}{4plus}
+% \begin{optionvalue}{6}
+% \begin{optionvalue}{8}
 % The \key{nup} option specifies how many slides to include per page.
 % The `plus' keyword indicates a layout with additional gaps for writing.
 %
@@ -1994,6 +2003,13 @@ suggestions for improvements or new features to the
     Allowed values are 2, 3, 3plus, 4, 4plus, 6, and 8.}%
 }
 %    \end{macrocode}
+% \end{optionvalue}
+% \end{optionvalue}
+% \end{optionvalue}
+% \end{optionvalue}
+% \end{optionvalue}
+% \end{optionvalue}
+% \end{optionvalue}
 % \end{optionkey}
 %
 % \begin{optionkey}{border}
