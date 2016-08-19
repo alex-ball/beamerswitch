@@ -69,6 +69,8 @@ first two steps.
 
 ## Licence
 
+Copyright 2016 Alex Ball.
+
 This work consists of the file beamerswitch.dtx and a Makefile.
 
 This work may be distributed and/or modified under the conditions of the
