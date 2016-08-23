@@ -12,7 +12,7 @@ UTREE = $(shell kpsewhich --var-value TEXMFHOME)
 all:	$(NAME).pdf $(NAME)-example.pdf clean
 	@exit 0
 $(NAME).cls $(NAME)-example.tex: $(NAME).dtx
-	lualatex -synctex=1 -shell-escape -interaction=batchmode $(NAME).dtx >/dev/null
+	tex -interaction=batchmode $(NAME).dtx >/dev/null
 $(NAME).pdf: $(NAME).dtx
 	latexmk -silent -lualatex -synctex=1 -shell-escape -interaction=batchmode $(NAME).dtx >/dev/null
 $(NAME)-example.pdf $(NAME)-example-trans.pdf $(NAME)-example-handout.pdf $(NAME)-example-article.pdf: $(NAME).cls $(NAME)-example.tex

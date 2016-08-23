@@ -33,44 +33,54 @@ you need, pre-compiled.
 
 A makefile is provided which you can use with the Make utility:
 
+  * Running `make beamerswitch.cls` just generates the class file (and a few
+    others).
   * Running `make` generates the class file and documentation.
-  * Running `make inst` installs the files to your home TeX tree.
-  * Running `make install` installs the files to the local TeX tree.
-  * Running `make uninst` uninstalls the files to your home TeX tree.
-  * Running `make uninstall` uninstalls the files to the local TeX tree.
+  * Running `make inst` generates and installs the files to your home TeX tree.
+    (To undo, run `make uninst`.)
+  * Running `make install` generates and installs the files to the local TeX
+    tree. (To undo, run `make uninstall`.)
+  * Running `make clean` removes auxiliary files from the working directory.
+  * Running `make distclean` removes the generated from the working directory
+    files as well.
 
 ### Manual way
 
 To install the class from scratch, follow these instructions. If you have
 downloaded the zip file from the [Releases] page on GitHub, you can skip the
-first two steps.
+first three steps.
 
- 1. Process `beamerswitch.dtx` with your favourite version of LaTeX with shell
+ 1. Run `tex beamerswitch.dtx` to generate the class file and the example file
+    `beamerswitch-example.tex`. (You can safely skip this step if you are
+    confident about step 2.)
+
+ 2. Compile `beamerswitch.dtx` with your favourite version of LaTeX with shell
     escape enabled (as required by `minted` for typesetting the listings). You
-    will also need to run it through `makeindex`. This will generate the class
-    file and the main documentation (DVI or PDF), plus an example file
-    `beamerswitch-example.tex`.
+    will also need to run it through `makeindex`. This will generate the main
+    documentation (DVI or PDF).
 
- 2. Process `beamerswitch-example.tex` with your favourite version of LaTeX. If
+ 3. Compile `beamerswitch-example.tex` with your favourite version of LaTeX. If
     you enable shell escape and have `latexmk` installed you will end up with
     another four documents (DVI or PDF). Otherwise you will get one.
 
- 3. To install the files, create the following folders in your chosen TeX tree
+ 4. To install the files, create the following folders in your chosen TeX tree
     and copy the files across as shown (read `.pdf` as `.dvi` if that is what
     you generated):
-
-     * `source/latex/beamerswitch`:
+     - `source/latex/beamerswitch`:
        `beamerswitch.dtx`,
        (`beamerswitch.ins`)
-     * `tex/latex/beamerswitch`:
+     - `tex/latex/beamerswitch`:
        `beamerswitch.cls`
-     * `doc/latex/beamerswitch`:
+     - `doc/latex/beamerswitch`:
        `beamerswitch.pdf`,
        `beamerswitch-example.tex`,
        `beamerswitch-example.pdf`,
        `beamerswitch-example-article.pdf`,
        `beamerswitch-example-handout.pdf`,
        `beamerswitch-example-trans.pdf`
+
+ 5. You may then have to update your installation's file name database
+    before TeX and friends can see the files.
 
 ## Licence
 
