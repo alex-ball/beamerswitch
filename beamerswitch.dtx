@@ -2174,6 +2174,9 @@ suggestions for improvements or new features to the
 % \end{macro}
 %
 % \begin{optionkey}{frametitles}
+% \begin{optionvalue}{para}
+% \begin{optionvalue}{margin}
+% \begin{optionvalue}{none}
 % \begin{macro}{beamerswitch@articleframetitles}
 % We offer some alternatives for handling frame titles in article mode.
 % \begin{itemize}
@@ -2194,6 +2197,9 @@ suggestions for improvements or new features to the
 }
 %    \end{macrocode}
 % \end{macro}
+% \end{optionvalue}
+% \end{optionvalue}
+% \end{optionvalue}
 % \end{optionkey}
 %
 % \begin{macro}{articlelayout}
@@ -2214,6 +2220,9 @@ suggestions for improvements or new features to the
 % easily end up duplicating section headings in running text, or captions in
 % figures. You may have other ideas, so we keep this behaviour configurable.
 %
+% \begin{optionvalue}{margin}
+% \begin{optionvalue}{none}
+% \begin{optionvalue}{para}
 % The \val{margin} value is implemented using \cs{marginpar}.
 %
 %    \begin{macrocode}
@@ -2237,6 +2246,9 @@ suggestions for improvements or new features to the
       }%
     }
 %    \end{macrocode}
+% \end{optionvalue}
+% \end{optionvalue}
+% \end{optionvalue}
 %
 % This is where we make our adjustments to \cs{maketitle}. We start by joining
 % the subtitle to the title by means of a colon instead of a newline.
