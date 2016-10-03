@@ -219,7 +219,7 @@ Copyright (C) 2016 by Alex Ball <a.j.ball@bath.ac.uk>
 %<class>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<class>\ProvidesClass{beamerswitch}
 %<*class>
-    [2016/08/19 v1.1 Convenient mode selection in Beamer documents]
+    [2016/10/03 v1.2 Convenient mode selection in Beamer documents]
 %</class>
 %<*driver>
 \documentclass[12pt]{article}
@@ -462,7 +462,6 @@ Copyright (C) 2016 by Alex Ball <a.j.ball@bath.ac.uk>
 
 \DisableCrossrefs
 \makeindex
-%\CodelineIndex
 \RecordChanges
 \begin{document}
 
@@ -485,6 +484,109 @@ class.
 To contact the author about this package, please visit the GitHub
 page where the code is hosted: \url{https://github.com/alex-ball/beamerswitch}.
 \end{absquote}
+
+\changes{v1.1}{2016/08/19}{Add `Quick start guide' section.}
+\changes{v1.2}{2016/10/03}{Add `Quick start guide' section.}
+\section{Quick start guide}
+
+Here are the key facts:
+
+\begin{itemize}
+\item
+  The \pkg{beamerswitch} class makes it easier to switch between
+  \pkg{beamer} modes.
+\item
+  It is aimed at you if you want to generate handouts from your
+  presentation, whether printouts of your slides or something more like a paper
+  or article.
+\item
+  It is \emph{not} a drop-in replacement for \pkg{beamer}.
+\end{itemize}
+
+If you have an existing \pkg{beamer} presentation and want convert it to use
+\pkg{beamerswitch} instead, here's what you need to do.
+
+\begin{enumerate}
+\item
+  Have you specified class options other than \key{ignorenonframetext}?
+  If so, start by rewriting your \cs{documentclass} line in terms of
+  \cs{PassOptionsToClass}:
+
+  \begin{multicols}{2}
+\begin{dispListing*}{title=Before,coltitle=black,fonttitle=\sffamily}
+\documentclass[10pt]{beamer}
+\end{dispListing*}
+    \columnbreak
+\begin{dispListing*}{title=After,coltitle=black,fonttitle=\sffamily}
+\PassOptionsToClass{10pt}{beamer}
+\end{dispListing*}
+  \end{multicols}
+
+  Then add `\cs{documentclass}\brackets{beamerswitch}' directly below.
+
+  Otherwise, simply replace your \cs{documentclass} line with the
+  \texttt{beamerswitch} one.
+
+\item
+  If you did \emph{not} specify \key{ignorenonframetext} as one of your
+  \pkg{beamer} options, add a `\cs{mode}\texttt{<all>}' line directly after
+  `\cs{begin}\brackets{document}'.
+
+\item
+  Wrap any preamble content intended only for your slides (like \cs{usetheme}
+  or \cs{usepackage} commands) with `\cs{mode}\texttt{<presentation>}\meta{\dots}'
+  or something more specific, as required.
+\end{enumerate}
+
+\pagebreak
+In summary, here is an example:
+
+\begin{multicols}{2}
+\begin{dispListing*}{title=Before,coltitle=black,fonttitle=\sffamily}
+\documentclass[10pt]{beamer}
+
+
+
+\usetheme{metropolis}
+
+\title{Test presentation}
+
+\begin{document}
+
+
+  \maketitle
+
+\end{document}
+\end{dispListing*}
+  \columnbreak
+\begin{dispListing*}{title=After,coltitle=black,fonttitle=\sffamily}
+\PassOptionsToClass{10pt}{beamer}
+\documentclass{beamerswitch}
+
+\mode<presentation>{%
+  \usetheme{metropolis}
+}
+\title{Test presentation}
+
+\begin{document}
+\mode<all>
+
+  \maketitle
+
+\end{document}
+\end{dispListing*}
+\end{multicols}
+
+At this point the document should compile exactly as before.
+
+If you intend to use article mode at all, I strongly suggest that you
+proceed by converting your document body so it that works without the
+`\cs{mode}\texttt{<all>}' line. That means making sure all slide content is in
+a \env{frame} environment, new command definitions are moved to the preamble,
+and so on.
+
+Lastly, read through the rest of this manual and see what \pkg{beamerswitch} can
+do for you!
 
 \section{Introduction}
 
@@ -709,6 +811,7 @@ compilation processes, it is possible to do that. Bear in mind, though, that
 other version on a previous run so you have to take care of that yourself. The
 command that does the business is this:
 
+\changes{v1.1}{2016/08/19}{Improve documentation of \cs{BeamerswitchSpawn}, \cs{handoutlayout} and \cs{articlelayout}.}
 \begin{docCommand}{BeamerswitchSpawn}{\marg{suffix}}
   Spawns a new compilation process with \meta{suffix} appended to the
   \cs{jobname}.
@@ -2270,6 +2373,7 @@ suggestions for improvements or new features to the
       }%
 %    \end{macrocode}
 %
+% \changes{v1.1}{2016/08/19}{Remove personal customizations from \key{maketitle} code.}
 % Our first change to \cs{maketitle} itself is to remove the initial vertical
 % space.
 %
