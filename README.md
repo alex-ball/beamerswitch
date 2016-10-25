@@ -1,6 +1,6 @@
 # beamerswitch: Convenient mode selection in Beamer documents
 
-This class is a wrapper around the `beamer` class to make it easier to use the
+This class is a wrapper around the [beamer] class to make it easier to use the
 same document to generate the different forms of the presentation: the slides
 themselves, an abbreviated slide set for transparencies or online reference,
 an n-up handout version, and a transcript or set of notes using the `article`
@@ -10,19 +10,32 @@ class.
 
 ### Dependencies
 
-To compile the documentation you will need to have the `minted` package working,
+To compile the documentation you will need to have the [minted] package working,
 which in turn relies on Python 2.6+ and Pygments. See the documentation of that
 package for details.
 
 There is an example file that demonstrates the features of the class.
 The class itself depends only on packages easily available through TeX
-distributions and CTAN. One feature relies on `latexmk` though you can work
+distributions and CTAN. One feature relies on [latexmk] though you can work
 around that if you have the patience.
 
 Note that the zip file on the [Releases] page on GitHub contains all the files
-you need, pre-compiled.
+you need, pre-compiled. You can also avoid the hassle by installing the class
+from your TeX distribution's package manager.
 
+[beamer]: http://ctan.org/pkg/beamer
+[minted]: http://ctan.org/pkg/minted
+[latexmk]: http://ctan.org/pkg/latexmk
 [Releases]: https://github.com/alex-ball/beamerswitch/releases
+
+### Managed way
+
+The latest stable release of the beamerswitch class has been packaged for
+TeX Live and MiKTeX. If you are running TeX Live and have `tlmgr`
+installed, you can install the package simply by running
+`tlmgr install beamerswitch`. If you are running MiKTeX, you can install the
+package by running `mpm --install=beamerswitch`. Both `tlmgr` and `mpm` have
+GUI versions that you might find friendlier.
 
 ### Automated way
 
