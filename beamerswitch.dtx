@@ -830,7 +830,7 @@ command that does the business is this:
   \cs{jobname}.
 \end{docCommand}
 
-See the \hyperref[sec:implementation]{Implementation} section below for the
+See the \hyperref[sec:switching]{Implementation} section below for the
 default definition. Again, if you want to pre-define this to do something else,
 you have to do it before loading the class:
 
@@ -1289,7 +1289,7 @@ suggestions for improvements or new features to the
 \ProcessOptionsX[DC]<beamerswitch>
 %    \end{macrocode}
 %
-% \subsection{Jobname-based mode switching}
+% \subsection{Jobname-based mode switching}\label{sec:switching}
 %
 % \begin{macro}{BeamerSuffix}
 % \begin{macro}{TransSuffix}
@@ -1311,7 +1311,8 @@ suggestions for improvements or new features to the
 % \begin{macro}{BeamerswitchSpawn}
 % We provide a special routine for spawning new \LaTeX\ processes. We allow
 % for the possibility of the user overriding this routine with another one,
-% perhaps using a different automation tool.
+% perhaps using a different automation tool; it should take one argument, being
+% the jobname suffix.
 %
 %    \begin{macrocode}
 \providecommand{\BeamerswitchSpawn}[1]{%
