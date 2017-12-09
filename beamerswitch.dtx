@@ -228,7 +228,7 @@ Copyright (C) 2016-2017 by Alex Ball <a.j.ball@bath.ac.uk>
 %<class>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<class>\ProvidesClass{beamerswitch}
 %<*class>
-    [2017/05/22 v1.2 Convenient mode selection in Beamer documents]
+    [2017/12/10 v1.3 Convenient mode selection in Beamer documents]
 %</class>
 %<*driver>
 \documentclass[12pt]{article}
@@ -827,9 +827,22 @@ command that does the business is this:
   \cs{jobname}.
 \end{docCommand}
 
-See the \hyperref[sec:switching]{Implementation} section below for the
-default definition. Again, if you want to pre-define this to do something else,
-you have to do it before loading the class:
+By default, \cs{BeamerswitchSpawn} checks which \LaTeX\ engine you are running,
+and then runs the matching one of \cs{SpawnedPDFTeX}, \cs{SpawnedXeTeX},
+\cs{SpawnedXeTeX}, or if all the tests fail, \cs{SpawnedTeX}, with the converted
+\cs{jobname}. These commands all add an engine-selecting option to a base
+command, \cs{SpawnedCompiler}, which by default is \pkg{latexmk} with synctex
+enabled, shell escape disabled and interaction set to batch mode. See the
+\hyperref[sec:switching]{Implementation} section below for details.
+
+Any of these commands can be pre-defined to something else, depending on what
+you want to do. So, for example, if you want to change the base \pkg{latexmk} options,
+pre-define \cs{SpawnedCompiler} to \texttt{latexmk} plus your chosen options
+(plus a space to avoid accidental string concatenation). If you want to switch
+to using \texttt{rubber}, say, pre-define \cs{SpawnedPDFTeX} and friends accordingly 
+(perhaps taking advantage of \cs{SpawnedCompiler} to reduce repetition). If you
+don't need the engine selection routine provided, simply pre-define
+\cs{BeamerswitchSpawn} to do whatever you need it to do:
 
 \begin{dispListing}
 \newcommand{\BeamerswitchSpawn}[1]{%
@@ -1305,29 +1318,45 @@ suggestions for improvements or new features to the
 % \end{macro}
 % \end{macro}
 %
+% \changes{v1.3}{2017/12/10}{Decompose \cs{BeamerswitchSpawn} into further configurable macros.}
 % \begin{macro}{BeamerswitchSpawn}
+% \begin{macro}{SpawnedTeX}
+% \begin{macro}{SpawnedPDFTeX}
+% \begin{macro}{SpawnedXeTeX}
+% \begin{macro}{SpawnedLuaTeX}
+% \begin{macro}{SpawnedCompiler}
 % We provide a special routine for spawning new \LaTeX\ processes. We allow
 % for the possibility of the user overriding this routine with another one,
 % perhaps using a different automation tool; it should take one argument, being
 % the jobname suffix.
 %
 %    \begin{macrocode}
+\providecommand{\SpawnedCompiler}{latexmk -silent -synctex=1 -interaction=batchmode }
+\providecommand{\SpawnedTeX}{\SpawnedCompiler}
+\providecommand{\SpawnedPDFTeX}{\SpawnedCompiler -pdf }
+\providecommand{\SpawnedLuaTeX}{\SpawnedCompiler -pdflua }
+\providecommand{\SpawnedXeTeX}{\SpawnedCompiler -pdfxe }
 \providecommand{\BeamerswitchSpawn}[1]{%
   \ifbool{PDFTeX}{%
-    \ShellEscape{latexmk -silent -pdf -synctex=1 -interaction=batchmode -jobname=\jobname#1 \jobname}
+    \ShellEscape{\SpawnedPDFTeX -jobname=\jobname#1 \jobname}
   }{%
     \ifbool{LuaTeX}{%
-      \ShellEscape{latexmk -silent -lualatex -synctex=1 -interaction=batchmode -jobname=\jobname#1 \jobname}
+      \ShellEscape{\SpawnedLuaTeX -jobname=\jobname#1 \jobname}
     }{%
       \ifbool{XeTeX}{%
-        \ShellEscape{latexmk -silent -xelatex -synctex=1 -interaction=batchmode -jobname=\jobname#1 \jobname}
+        \ShellEscape{\SpawnedXeTeX -jobname=\jobname#1 \jobname}
       }{%
-        \ShellEscape{latexmk -silent -synctex=1 -interaction=batchmode -jobname=\jobname#1 \jobname}
+        \ShellEscape{\SpawnedTeX -jobname=\jobname#1 \jobname}
       }%
     }%
   }%
 }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 %
 % We check for special jobnames and use them to override the above mode-related
