@@ -829,25 +829,54 @@ command that does the business is this:
 
 By default, \cs{BeamerswitchSpawn} checks which \LaTeX\ engine you are running,
 and then runs the matching one of \cs{SpawnedPDFTeX}, \cs{SpawnedXeTeX},
-\cs{SpawnedXeTeX}, or if all the tests fail, \cs{SpawnedTeX}, with the converted
+\cs{SpawnedLuaTeX}, or if all the tests fail, \cs{SpawnedTeX}, with the converted
 \cs{jobname}. These commands all add an engine-selecting option to a base
 command, \cs{SpawnedCompiler}, which by default is \pkg{latexmk} with synctex
 enabled, shell escape disabled and interaction set to batch mode. See the
 \hyperref[sec:switching]{Implementation} section below for details.
 
 Any of these commands can be pre-defined to something else, depending on what
-you want to do. So, for example, if you want to change the base \pkg{latexmk} options,
-pre-define \cs{SpawnedCompiler} to \texttt{latexmk} plus your chosen options
-(plus a space to avoid accidental string concatenation). If you want to switch
-to using \texttt{rubber}, say, pre-define \cs{SpawnedPDFTeX} and friends accordingly 
-(perhaps taking advantage of \cs{SpawnedCompiler} to reduce repetition). If you
-don't need the engine selection routine provided, simply pre-define
+you want to do. So, for example, if you want to change the base \pkg{latexmk}
+options, pre-define \cs{SpawnedCompiler} to \texttt{latexmk} plus your chosen
+options:
+
+\begin{dispListing}
+\newcommand*{\SpawnedCompiler}{%
+  latexmk -silent -shell-escape -interaction=nonstopmode}
+\documentclass{beamerswitch}
+\end{dispListing}
+
+If you want to switch to using \texttt{rubber}, say, pre-define
+\cs{SpawnedPDFTeX} and friends accordingly (perhaps taking advantage of
+\cs{SpawnedCompiler} to reduce repetition):
+
+\begin{dispListing}
+\newcommand*{\SpawnedCompiler}{rubber -q --synctex}
+\newcommand*{\SpawnedPDFTeX}{\SpawnedCompiler -m pdftex}
+\newcommand*{\SpawnedXeTeX}{\SpawnedCompiler -m xelatex}
+\documentclass{beamerswitch}
+\end{dispListing}
+
+If you don't need the engine selection routine provided, simply pre-define
 \cs{BeamerswitchSpawn} to do whatever you need it to do:
 
 \begin{dispListing}
-\newcommand{\BeamerswitchSpawn}[1]{%
-  \ShellEscape{...}%
+\newcommand*{\BeamerswitchSpawn}[1]{%
+  \ShellEscape{... -jobname=\jobname#1 \jobname}%
 }
+\documentclass{beamerswitch}
+\end{dispListing}
+
+If you want to use \pkg{arara} to compile everything, the class options won't
+help you as \pkg{arara} does not let you change \cs{jobname}s on the command line.
+That's no problem, though, because you can do it manually within your list of
+directives:
+
+\begin{dispListing}
+% arara: lualatex
+% arara: lualatex: { options: "-jobname beamerswitch-example-article" }
+% arara: lualatex: { options: "-jobname beamerswitch-example-handout" }
+% arara: lualatex: { options: "-jobname beamerswitch-example-trans" }
 \documentclass{beamerswitch}
 \end{dispListing}
 
@@ -1072,6 +1101,14 @@ preamble.
   modes. The available \meta{options} are listed below.
 \end{docCommand}
 
+\begin{docKey}{frametitles}{=\val{para}\textbar\val{margin}\textbar\val{none}}{no default, initially \val{para}}
+  In \key{article} mode, affects how frame titles are printed. By default,
+  \pkg{beamerarticle} prints them as paragraph headings, represented by
+  the value \docValue{para}. To have them printed in the margin (using
+  \cs{marginpar}), use \docValue{margin}. To omit them altogether, use the value
+  \docValue{none}.
+\end{docKey}
+
 \begin{docKey}{maketitle}{}{no value, initially unset}
   In \key{article} mode, adjusts the \cs{maketitle} routine:
   \begin{itemize}
@@ -1095,14 +1132,6 @@ preamble.
 \begin{dispListing}
 \toggletrue{titlepunct}
 \end{dispListing}
-\end{docKey}
-
-\begin{docKey}{frametitles}{=\val{para}\textbar\val{margin}\textbar\val{none}}{no default, initially \val{para}}
-  In \key{article} mode, affects how frame titles are printed. By default,
-  \pkg{beamerarticle} prints them as paragraph headings, represented by
-  the value \docValue{para}. To have them printed in the margin (using
-  \cs{marginpar}), use \docValue{margin}. To omit them altogether, use the value
-  \docValue{none}.
 \end{docKey}
 
 \section{Tips for further configuration}
