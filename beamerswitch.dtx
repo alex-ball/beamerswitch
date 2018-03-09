@@ -520,7 +520,8 @@ If you have an existing \pkg{beamer} presentation and want convert it to use
 \item
   Have you specified class options other than \key{ignorenonframetext}?
   If so, start by rewriting your \cs{documentclass} line in terms of
-  \cs{PassOptionsToClass}:
+  \cs{PassOptionsToClass} -- note that the optional argument (in square
+  brackets) becomes mandatory (in curly braces):
 
   \begin{multicols}{2}
 \begin{dispListing*}{title=Before,coltitle=black,fonttitle=\sffamily}
@@ -548,7 +549,6 @@ If you have an existing \pkg{beamer} presentation and want convert it to use
   or something more specific, as required.
 \end{enumerate}
 
-\pagebreak
 In summary, here is an example:
 
 \begin{multicols}{2}
@@ -556,33 +556,25 @@ In summary, here is an example:
 \documentclass[10pt]{beamer}
 
 
-
 \usetheme{metropolis}
 
 \title{Test presentation}
-
 \begin{document}
 
-
   \maketitle
-
 \end{document}
 \end{dispListing*}
   \columnbreak
 \begin{dispListing*}{title=After,coltitle=black,fonttitle=\sffamily}
 \PassOptionsToClass{10pt}{beamer}
 \documentclass{beamerswitch}
-
 \mode<presentation>{%
   \usetheme{metropolis}
 }
 \title{Test presentation}
-
 \begin{document}
 \mode<all>
-
   \maketitle
-
 \end{document}
 \end{dispListing*}
 \end{multicols}
