@@ -228,7 +228,7 @@ Copyright (C) 2016-2017 by Alex Ball <a.j.ball@bath.ac.uk>
 %<class>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<class>\ProvidesClass{beamerswitch}
 %<*class>
-    [2017/12/10 v1.3 Convenient mode selection in Beamer documents]
+    [2018/08/29 v1.4 Convenient mode selection in Beamer documents]
 %</class>
 %<*driver>
 \documentclass[12pt]{article}
@@ -1073,14 +1073,21 @@ using the following command in the preamble.
   \label{fig:layouts}
 \end{figure}
 
+\begin{docKey}{pnos}{}{no value, initially unset}
+  Adds page numbers to the bottom of each page.
+\end{docKey}
+
 \begin{docKey}{border}{=\meta{length}}{default 0.4pt, initially 0pt}
   Puts a rectangular border of thickness \meta{length} around each slide. Note
   that the borders are drawn regardless of whether a slide is actually printed,
   so you may end up with empty boxes on the last page.
 \end{docKey}
 
-\begin{docKey}{pnos}{}{no value, initially unset}
-  Adds page numbers to the bottom of each page.
+\begin{docKey}{margin}{=\meta{length}}{default 5mm, initially 5mm}
+  Sets how much extra space to leave around each slide on the page. To achieve
+  this it uses the \key{border shrink} option from \pkg{pgfpages}. If you add
+  page numbers, this value will increase if necessary to prevent the number
+  colliding with the slides.
 \end{docKey}
 
 \section{Changing the look of article mode}
@@ -2152,6 +2159,7 @@ suggestions for improvements or new features to the
 % unlikely to be clean code, we settle here for setting it with an option.
 %
 %    \begin{macrocode}
+\def\beamerswitch@handoutpaper{a4paper}
 \define@key[HL]{beamerswitch}{paper}{%
   \def\beamerswitch@handoutpaper{#1}%
 }
@@ -2172,6 +2180,7 @@ suggestions for improvements or new features to the
 %
 %    \begin{macrocode}
 \newcounter{beamerswitch@nupcase}
+\setcounter{beamerswitch@nupcase}{5}
 \define@choicekey+[HL]{beamerswitch}{nup}[\val\nr]{2, 3, 3plus, 4, 4plus, 6, 8}{%
   \setcounter{beamerswitch@nupcase}{\nr}
 }{%
@@ -2201,10 +2210,27 @@ suggestions for improvements or new features to the
 %    \end{macrocode}
 % \end{optionkey}
 %
+% \changes{v1.4}{2018/08/29}{Make margins around slides a configurable size}
+% \begin{optionkey}{margin}
+% The \key{margin} option controls how much white space is added around each
+% slide on handout pages. It corresponds to the \texttt{border shrink} option
+% of \cs{pgfpagesuselayout}.
+%
+%    \begin{macrocode}
+\newlength{\beamerswitch@margin}
+\setlength{\beamerswitch@margin}{5mm}
+\define@key[HL]{beamerswitch}{margin}[5mm]{%
+  \setlength{\beamerswitch@margin}{#1}%
+}
+%    \end{macrocode}
+% \end{optionkey}
+%
 % \begin{optionkey}{pnos}
 % The \key{pnos} option switches on page numbers for handout pages.
 %
 %    \begin{macrocode}
+\newlength{\beamerswitch@pnobase}
+\setlength{\beamerswitch@pnobase}{5mm}
 \define@boolkey[HL]{beamerswitch}{pnos}[true]{}
 %    \end{macrocode}
 % \end{optionkey}
@@ -2219,35 +2245,40 @@ suggestions for improvements or new features to the
     \setkeys[HL]{beamerswitch}{#1}%
     \ifcase\value{beamerswitch@nupcase}\relax
       \def\beamerswitch@nup{2}
-      \pgfpagesuselayout{1 by 2}[\beamerswitch@handoutpaper,border shrink=5mm]%
+      \pgfpagesuselayout{1 by 2}[\beamerswitch@handoutpaper,border shrink=\the\beamerswitch@margin]%
     \or
       \def\beamerswitch@nup{3}
-      \pgfpagesuselayout{1 by 3}[\beamerswitch@handoutpaper,border shrink=5mm]%
+      \pgfpagesuselayout{1 by 3}[\beamerswitch@handoutpaper,border shrink=\the\beamerswitch@margin]%
     \or
       \def\beamerswitch@nup{3}
-      \pgfpagesuselayout{1 by 3 narrow}[\beamerswitch@handoutpaper,border shrink=5mm]%
+      \pgfpagesuselayout{1 by 3 narrow}[\beamerswitch@handoutpaper,border shrink=\the\beamerswitch@margin]%
     \or
       \def\beamerswitch@nup{4}
-      \pgfpagesuselayout{2 by 2}[\beamerswitch@handoutpaper,landscape,border shrink=5mm]%
+      \pgfpagesuselayout{2 by 2}[\beamerswitch@handoutpaper,landscape,border shrink=\the\beamerswitch@margin]%
     \or
       \def\beamerswitch@nup{4}
-      \pgfpagesuselayout{1 by 4 narrow}[\beamerswitch@handoutpaper,border shrink=5mm]%
+      \pgfpagesuselayout{1 by 4 narrow}[\beamerswitch@handoutpaper,border shrink=\the\beamerswitch@margin]%
     \or
       \def\beamerswitch@nup{6}
-      \pgfpagesuselayout{2 by 3}[\beamerswitch@handoutpaper,border shrink=5mm]%
+      \pgfpagesuselayout{2 by 3}[\beamerswitch@handoutpaper,border shrink=\the\beamerswitch@margin]%
     \or
       \def\beamerswitch@nup{8}
-      \pgfpagesuselayout{2 by 4}[\beamerswitch@handoutpaper,border shrink=5mm]%
+      \pgfpagesuselayout{2 by 4}[\beamerswitch@handoutpaper,border shrink=\the\beamerswitch@margin]%
     \fi
     \ifbool{HL@beamerswitch@pnos}{%
       \def\pgfsys@endpicture{%
-        \raisebox{5mm}[0pt][0pt]{%
+        \raisebox{\the\beamerswitch@pnobase}[0pt][0pt]{%
           \makebox[\pgfphysicalwidth]{%
-            \the\numexpr\value{page}/\beamerswitch@nup\relax
+            \the\numexpr(\value{page} - 2 + (\beamerswitch@nup / 2))/\beamerswitch@nup\relax
           }%
-        }%
+        }\par
       }%
-    }{}%
+      \ifdimcomp{\beamerswitch@margin}{<}{\beamerswitch@pnobase + 1em}{%
+        \setlength{\beamerswitch@margin}{\the\dimexpr\beamerswitch@pnobase + 1em\relax}%
+      }{}
+    }{%
+      \def\pgfsys@endpicture{}%
+    }%
   }%
 }
 %    \end{macrocode}
@@ -2257,7 +2288,11 @@ suggestions for improvements or new features to the
 % We initialize the class with a layout of six slides on A4 paper.
 %
 %    \begin{macrocode}
-\handoutlayout{paper=a4paper,nup=6}
+\AtEndPreamble{
+  \ifdef{\beamerswitch@nup}{}{%
+    \handoutlayout{paper=a4paper,nup=6}%
+  }%
+}
 %    \end{macrocode}
 %
 % \subsection{Article layout}
