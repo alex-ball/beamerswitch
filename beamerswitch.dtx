@@ -1074,7 +1074,9 @@ using the following command in the preamble.
 \end{figure}
 
 \begin{docKey}{pnos}{}{no value, initially unset}
-  Adds page numbers to the bottom of each page.
+  Adds page numbers to the bottom of each page. The number appears at a distance
+  of \cs{handoutpnobaseline} (initially 5mm) from the bottom edge of the page.
+  You change this with \cs{setlength}.
 \end{docKey}
 
 \begin{docKey}{border}{=\meta{length}}{default 0.4pt, initially 0pt}
@@ -1088,6 +1090,14 @@ using the following command in the preamble.
   this it uses the \key{border shrink} option from \pkg{pgfpages}. If you add
   page numbers, this value will increase if necessary to prevent the number
   colliding with the slides.
+\end{docKey}
+
+\begin{docKey}{align}{}{no value, initially unset}
+  When \key{margin} is non-zero, the effective page margins are approximately
+  half the size of the gaps between slides (some additional white space comes
+  from preserving the aspect ratio of the slides). When set, this option tweaks
+  the positions of the slides so that the page margins are approximately the
+  same as the interior gaps.
 \end{docKey}
 
 \section{Changing the look of article mode}
@@ -1628,45 +1638,74 @@ suggestions for improvements or new features to the
 % We set up the \cs{handoutlayout} command for applying these options.
 %
 %    \begin{macrocode}
+\newlength{\beamerswitch@pnoadjust}
 \newcommand*{\handoutlayout}[1]{%
   \only<handout>{%
+    \setlength{\beamerswitch@pnoadjust}{1em}%
     \setkeys[HL]{beamerswitch}{#1}%
-    \ifcase\value{beamerswitch@nupcase}\relax
-      \def\beamerswitch@nup{2}%
-      \pgfpagesuselayout{1 by 2}[\beamerswitch@handoutpaper,border shrink=\the\beamerswitch@margin]%
-    \or
-      \def\beamerswitch@nup{3}%
-      \pgfpagesuselayout{1 by 3}[\beamerswitch@handoutpaper,border shrink=\the\beamerswitch@margin]%
-    \or
-      \def\beamerswitch@nup{3}%
-      \pgfpagesuselayout{1 by 3 narrow}[\beamerswitch@handoutpaper,border shrink=\the\beamerswitch@margin]%
-    \or
-      \def\beamerswitch@nup{4}%
-      \pgfpagesuselayout{2 by 2}[\beamerswitch@handoutpaper,landscape,border shrink=\the\beamerswitch@margin]%
-    \or
-      \def\beamerswitch@nup{4}%
-      \pgfpagesuselayout{1 by 4 narrow}[\beamerswitch@handoutpaper,border shrink=\the\beamerswitch@margin]%
-    \or
-      \def\beamerswitch@nup{6}%
-      \pgfpagesuselayout{2 by 3}[\beamerswitch@handoutpaper,border shrink=\the\beamerswitch@margin]%
-    \or
-      \def\beamerswitch@nup{8}%
-      \pgfpagesuselayout{2 by 4}[\beamerswitch@handoutpaper,border shrink=\the\beamerswitch@margin]%
-    \fi
     \ifbool{HL@beamerswitch@pnos}{%
       \def\pgfsys@endpicture{%
         \raisebox{\the\handoutpnobaseline}[0pt][0pt]{%
           \makebox[\pgfphysicalwidth]{%
-            \the\numexpr(\value{page} - 2 + (\beamerswitch@nup / 2))/\beamerswitch@nup\relax
+            \the\numexpr(\value{page} - 2 + (\beamerswitch@nup / 2))%
+              / \beamerswitch@nup\relax
           }%
         }\par
       }%
-      \ifdimcomp{\beamerswitch@margin}{<}{\handoutpnobaseline + 1em}{%
-        \setlength{\beamerswitch@margin}{\the\dimexpr\handoutpnobaseline + 1em\relax}%
-      }{}
+      \ifbool{HL@beamerswitch@align}{%
+        \ifcase\value{beamerswitch@nupcase}\relax
+          \addtolength{\beamerswitch@pnoadjust}{-0.333\beamerswitch@margin}%
+        \or
+          \addtolength{\beamerswitch@pnoadjust}{-0.5\beamerswitch@margin}%
+        \or
+          \addtolength{\beamerswitch@pnoadjust}{-0.5\beamerswitch@margin}%
+        \or
+          \addtolength{\beamerswitch@pnoadjust}{-0.333\beamerswitch@margin}%
+        \or
+          \addtolength{\beamerswitch@pnoadjust}{-0.6\beamerswitch@margin}%
+        \or
+          \addtolength{\beamerswitch@pnoadjust}{-0.5\beamerswitch@margin}%
+        \or
+          \addtolength{\beamerswitch@pnoadjust}{-0.6\beamerswitch@margin}%
+        \fi
+      }{}%
+      \ifdimcomp{\beamerswitch@margin}{<}%
+          {\handoutpnobaseline + \beamerswitch@pnoadjust}{%
+        \setlength{\beamerswitch@margin}%
+          {\the\dimexpr\handoutpnobaseline + \beamerswitch@pnoadjust\relax}%
+      }{}%
     }{%
       \def\pgfsys@endpicture{}%
     }%
+    \ifcase\value{beamerswitch@nupcase}\relax
+      \def\beamerswitch@nup{2}%
+      \pgfpagesuselayout{1 by 2}[\beamerswitch@handoutpaper,%
+        border shrink=\the\beamerswitch@margin]%
+    \or
+      \def\beamerswitch@nup{3}%
+      \pgfpagesuselayout{1 by 3}[\beamerswitch@handoutpaper,%
+        border shrink=\the\beamerswitch@margin]%
+    \or
+      \def\beamerswitch@nup{3}%
+      \pgfpagesuselayout{1 by 3 narrow}[\beamerswitch@handoutpaper,%
+        border shrink=\the\beamerswitch@margin]%
+    \or
+      \def\beamerswitch@nup{4}%
+      \pgfpagesuselayout{2 by 2}[\beamerswitch@handoutpaper,%
+        landscape,border shrink=\the\beamerswitch@margin]%
+    \or
+      \def\beamerswitch@nup{4}%
+      \pgfpagesuselayout{1 by 4 narrow}[\beamerswitch@handoutpaper,%
+        border shrink=\the\beamerswitch@margin]%
+    \or
+      \def\beamerswitch@nup{6}%
+      \pgfpagesuselayout{2 by 3}[\beamerswitch@handoutpaper,%
+        border shrink=\the\beamerswitch@margin]%
+    \or
+      \def\beamerswitch@nup{8}%
+      \pgfpagesuselayout{2 by 4}[\beamerswitch@handoutpaper,%
+        border shrink=\the\beamerswitch@margin]%
+    \fi
   }%
 }
 %    \end{macrocode}
@@ -1713,7 +1752,11 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=\pgfphysicalheight,%
-      center=\pgfpoint{.25\pgfphysicalwidth}{.5\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.25\pgfphysicalwidth + 0.333\beamerswitch@margin}{.5\pgfphysicalheight}%
+      }{%
+        \pgfpoint{.25\pgfphysicalwidth}{.5\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{2}
     {%
@@ -1721,7 +1764,11 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=\pgfphysicalheight,%
-      center=\pgfpoint{.75\pgfphysicalwidth}{.5\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.75\pgfphysicalwidth - 0.333\beamerswitch@margin}{.5\pgfphysicalheight}%
+      }{%
+        \pgfpoint{.75\pgfphysicalwidth}{.5\pgfphysicalheight}%
+      }%
     }%
     \else
     % stack on top of one another
@@ -1779,7 +1826,11 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.333\pgfphysicalwidth,%
       resized height=\pgfphysicalheight,%
-      center=\pgfpoint{.167\pgfphysicalwidth}{.5\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.167\pgfphysicalwidth + 0.5\beamerswitch@margin}{.5\pgfphysicalheight}%
+      }{%
+        \pgfpoint{.167\pgfphysicalwidth}{.5\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{2}
     {%
@@ -1795,7 +1846,11 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.333\pgfphysicalwidth,%
       resized height=\pgfphysicalheight,%
-      center=\pgfpoint{.833\pgfphysicalwidth}{.5\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.833\pgfphysicalwidth - 0.5\beamerswitch@margin}{.5\pgfphysicalheight}%
+      }{%
+        \pgfpoint{.833\pgfphysicalwidth}{.5\pgfphysicalheight}%
+      }%
     }%
     \else
     % stack on top of one another
@@ -1805,7 +1860,11 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=\pgfphysicalwidth,%
       resized height=.333\pgfphysicalheight,%
-      center=\pgfpoint{.5\pgfphysicalwidth}{.833\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.5\pgfphysicalwidth}{.833\pgfphysicalheight - 0.5\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.5\pgfphysicalwidth}{.833\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{2}
     {%
@@ -1821,7 +1880,11 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=\pgfphysicalwidth,%
       resized height=.333\pgfphysicalheight,%
-      center=\pgfpoint{.5\pgfphysicalwidth}{.167\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.5\pgfphysicalwidth}{.167\pgfphysicalheight + 0.5\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.5\pgfphysicalwidth}{.167\pgfphysicalheight}%
+      }%
     }%
     \fi
   }
@@ -1854,7 +1917,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.333\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.167\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.167\pgfphysicalwidth + 0.5\beamerswitch@margin}%
+          {.75\pgfphysicalheight - 0.5\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.167\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{2}
     {%
@@ -1862,7 +1930,11 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.333\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.5\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.5\pgfphysicalwidth}{.75\pgfphysicalheight - 0.5\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.5\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{3}
     {%
@@ -1870,7 +1942,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.333\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.833\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.833\pgfphysicalwidth - 0.5\beamerswitch@margin}%
+          {.75\pgfphysicalheight - 0.5\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.833\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      }%
     }%
     \else
     % stack on top of one another
@@ -1880,7 +1957,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.333\pgfphysicalheight,%
-      center=\pgfpoint{.25\pgfphysicalwidth}{.833\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.25\pgfphysicalwidth + 0.5\beamerswitch@margin}%
+          {.833\pgfphysicalheight - 0.5\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.25\pgfphysicalwidth}{.833\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{2}
     {%
@@ -1888,7 +1970,11 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.333\pgfphysicalheight,%
-      center=\pgfpoint{.25\pgfphysicalwidth}{.5\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.25\pgfphysicalwidth + 0.5\beamerswitch@margin}{.5\pgfphysicalheight}%
+      }{%
+        \pgfpoint{.25\pgfphysicalwidth}{.5\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{3}
     {%
@@ -1896,7 +1982,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.333\pgfphysicalheight,%
-      center=\pgfpoint{.25\pgfphysicalwidth}{.167\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.25\pgfphysicalwidth + 0.5\beamerswitch@margin}%
+          {.167\pgfphysicalheight + 0.5\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.25\pgfphysicalwidth}{.167\pgfphysicalheight}%
+      }%
     }%
     \fi
   }
@@ -1907,7 +1998,7 @@ suggestions for improvements or new features to the
 %    \begin{macrocode}
   \pgfpagesdeclarelayout{2 by 2}
   {
-    \edef\pgfpageoptionheight{\the\paperheight} 
+    \edef\pgfpageoptionheight{\the\paperheight}
     \edef\pgfpageoptionwidth{\the\paperwidth}
     \edef\pgfpageoptionborder{0pt}
   }
@@ -1924,7 +2015,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.25\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.25\pgfphysicalwidth + 0.333\beamerswitch@margin}%
+          {.75\pgfphysicalheight - 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.25\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{2}
     {%
@@ -1932,7 +2028,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.75\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.75\pgfphysicalwidth - 0.333\beamerswitch@margin}%
+          {.75\pgfphysicalheight - 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.75\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{3}
     {%
@@ -1940,7 +2041,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.25\pgfphysicalwidth}{.25\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.25\pgfphysicalwidth + 0.333\beamerswitch@margin}%
+          {.25\pgfphysicalheight + 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.25\pgfphysicalwidth}{.25\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{4}
     {%
@@ -1948,7 +2054,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.75\pgfphysicalwidth}{.25\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.75\pgfphysicalwidth - 0.333\beamerswitch@margin}%
+          {.25\pgfphysicalheight + 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.75\pgfphysicalwidth}{.25\pgfphysicalheight}%
+      }%
     }%
   }
 %    \end{macrocode}
@@ -1980,7 +2091,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.25\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.125\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.125\pgfphysicalwidth + 0.6\beamerswitch@margin}%
+          {.75\pgfphysicalheight - 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.125\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{2}
     {%
@@ -1988,7 +2104,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.25\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.375\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.375\pgfphysicalwidth + 0.2\beamerswitch@margin}%
+          {.75\pgfphysicalheight - 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.375\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{3}
     {%
@@ -1996,7 +2117,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.25\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.625\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.625\pgfphysicalwidth - 0.2\beamerswitch@margin}%
+          {.75\pgfphysicalheight - 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.625\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{4}
     {%
@@ -2004,7 +2130,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.25\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.875\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.875\pgfphysicalwidth - 0.6\beamerswitch@margin}%
+          {.75\pgfphysicalheight - 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.875\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      }%
     }%
     \else
     % stack on top of one another
@@ -2014,7 +2145,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.25\pgfphysicalheight,%
-      center=\pgfpoint{.25\pgfphysicalwidth}{.875\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.25\pgfphysicalwidth + 0.333\beamerswitch@margin}%
+          {.875\pgfphysicalheight - 0.6\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.25\pgfphysicalwidth}{.875\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{2}
     {%
@@ -2022,7 +2158,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.25\pgfphysicalheight,%
-      center=\pgfpoint{.25\pgfphysicalwidth}{.625\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.25\pgfphysicalwidth + 0.333\beamerswitch@margin}%
+          {.625\pgfphysicalheight - 0.2\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.25\pgfphysicalwidth}{.625\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{3}
     {%
@@ -2030,7 +2171,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.25 \pgfphysicalheight,%
-      center=\pgfpoint{.25\pgfphysicalwidth}{.375\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.25\pgfphysicalwidth + 0.333\beamerswitch@margin}%
+          {.375\pgfphysicalheight + 0.2\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.25\pgfphysicalwidth}{.375\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{4}
     {%
@@ -2038,7 +2184,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.25 \pgfphysicalheight,%
-      center=\pgfpoint{.25\pgfphysicalwidth}{.125\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.25\pgfphysicalwidth + 0.333\beamerswitch@margin}%
+          {.125\pgfphysicalheight + 0.6\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.25\pgfphysicalwidth}{.125\pgfphysicalheight}%
+      }%
     }%
     \fi
   }
@@ -2070,7 +2221,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.333\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.167\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.167\pgfphysicalwidth + 0.5\beamerswitch@margin}%
+          {.75\pgfphysicalheight - 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.167\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{2}
     {%
@@ -2078,7 +2234,11 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.333\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.5\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.5\pgfphysicalwidth}{.75\pgfphysicalheigh - 0.333\beamerswitch@margint}%
+      }{%
+        \pgfpoint{.5\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{3}
     {%
@@ -2086,7 +2246,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.333\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.833\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.833\pgfphysicalwidth - 0.5\beamerswitch@margin}%
+          {.75\pgfphysicalheight - 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.833\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{4}
     {%
@@ -2094,7 +2259,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.333\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.167\pgfphysicalwidth}{.25\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.167\pgfphysicalwidth + 0.5\beamerswitch@margin}%
+          {.25\pgfphysicalheight + 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.167\pgfphysicalwidth}{.25\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{5}
     {%
@@ -2102,7 +2272,11 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.333\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.5\pgfphysicalwidth}{.25\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.5\pgfphysicalwidth}{.25\pgfphysicalheight + 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.5\pgfphysicalwidth}{.25\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{6}
     {%
@@ -2110,7 +2284,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.333\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.833\pgfphysicalwidth}{.25\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.833\pgfphysicalwidth - 0.5\beamerswitch@margin}%
+          {.25\pgfphysicalheight + 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.833\pgfphysicalwidth}{.25\pgfphysicalheight}%
+      }%
     }%
     \else
     % stack on top of one another
@@ -2119,7 +2298,12 @@ suggestions for improvements or new features to the
       border shrink=\pgfpageoptionborder,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.333\pgfphysicalheight,%
-      center=\pgfpoint{.25\pgfphysicalwidth}{.833\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.25\pgfphysicalwidth + 0.333\beamerswitch@margin}%
+          {.833\pgfphysicalheight - 0.5\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.25\pgfphysicalwidth}{.833\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{2}
     {%
@@ -2127,7 +2311,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.333\pgfphysicalheight,%
-      center=\pgfpoint{.75\pgfphysicalwidth}{.833\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.75\pgfphysicalwidth - 0.333\beamerswitch@margin}%
+          {.833\pgfphysicalheight - 0.5\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.75\pgfphysicalwidth}{.833\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{3}
     {%
@@ -2135,7 +2324,11 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.333\pgfphysicalheight,%
-      center=\pgfpoint{.25\pgfphysicalwidth}{.5\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.25\pgfphysicalwidth + 0.333\beamerswitch@margin}{.5\pgfphysicalheight}%
+      }{%
+        \pgfpoint{.25\pgfphysicalwidth}{.5\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{4}
     {%
@@ -2143,7 +2336,11 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.333\pgfphysicalheight,%
-      center=\pgfpoint{.75\pgfphysicalwidth}{.5\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.75\pgfphysicalwidth - 0.333\beamerswitch@margin}{.5\pgfphysicalheight}%
+      }{%
+        \pgfpoint{.75\pgfphysicalwidth}{.5\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{5}
     {%
@@ -2151,7 +2348,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.333\pgfphysicalheight,%
-      center=\pgfpoint{.25\pgfphysicalwidth}{.167\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.25\pgfphysicalwidth + 0.333\beamerswitch@margin}%
+          {.167\pgfphysicalheight + 0.5\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.25\pgfphysicalwidth}{.167\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{6}
     {%
@@ -2159,7 +2361,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.333\pgfphysicalheight,%
-      center=\pgfpoint{.75\pgfphysicalwidth}{.167\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.75\pgfphysicalwidth - 0.333\beamerswitch@margin}%
+          {.167\pgfphysicalheight + 0.5\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.75\pgfphysicalwidth}{.167\pgfphysicalheight}%
+      }%
     }%
     \fi
   }
@@ -2191,7 +2398,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.25\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.125\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.125\pgfphysicalwidth + 0.6\beamerswitch@margin}%
+          {.75\pgfphysicalheight - 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.125\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{2}
     {%
@@ -2199,7 +2411,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.25\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.375\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.375\pgfphysicalwidth + 0.2\beamerswitch@margin}%
+          {.75\pgfphysicalheight - 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.375\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{3}
     {%
@@ -2207,7 +2424,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.25\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.625\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.625\pgfphysicalwidth - 0.2\beamerswitch@margin}%
+          {.75\pgfphysicalheight - 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.625\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{4}
     {%
@@ -2215,7 +2437,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.25\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.875\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.875\pgfphysicalwidth - 0.6\beamerswitch@margin}%
+          {.75\pgfphysicalheight - 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.875\pgfphysicalwidth}{.75\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{5}
     {%
@@ -2223,7 +2450,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.25\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.125\pgfphysicalwidth}{.25\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.125\pgfphysicalwidth + 0.6\beamerswitch@margin}%
+          {.25\pgfphysicalheight + 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.125\pgfphysicalwidth}{.25\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{6}
     {%
@@ -2231,7 +2463,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.25\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.375\pgfphysicalwidth}{.25\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.375\pgfphysicalwidth + 0.2\beamerswitch@margin}%
+          {.25\pgfphysicalheight + 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.375\pgfphysicalwidth}{.25\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{7}
     {%
@@ -2239,7 +2476,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.25\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.625\pgfphysicalwidth}{.25\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.625\pgfphysicalwidth - 0.2\beamerswitch@margin}%
+          {.25\pgfphysicalheight + 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.625\pgfphysicalwidth}{.25\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{8}
     {%
@@ -2247,7 +2489,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.25\pgfphysicalwidth,%
       resized height=.5\pgfphysicalheight,%
-      center=\pgfpoint{.875\pgfphysicalwidth}{.25\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.875\pgfphysicalwidth - 0.6\beamerswitch@margin}%
+          {.25\pgfphysicalheight + 0.333\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.875\pgfphysicalwidth}{.25\pgfphysicalheight}%
+      }%
     }%
     \else
     % stack on top of one another
@@ -2257,7 +2504,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.25\pgfphysicalheight,%
-      center=\pgfpoint{.25\pgfphysicalwidth}{.875\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.25\pgfphysicalwidth + 0.333\beamerswitch@margin}%
+          {.875\pgfphysicalheight - 0.6\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.25\pgfphysicalwidth}{.875\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{2}
     {%
@@ -2265,7 +2517,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.25\pgfphysicalheight,%
-      center=\pgfpoint{.75\pgfphysicalwidth}{.875\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.75\pgfphysicalwidth - 0.333\beamerswitch@margin}%
+          {.875\pgfphysicalheight - 0.6\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.75\pgfphysicalwidth}{.875\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{3}
     {%
@@ -2273,7 +2530,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.25\pgfphysicalheight,%
-      center=\pgfpoint{.25\pgfphysicalwidth}{.625\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.25\pgfphysicalwidth + 0.333\beamerswitch@margin}%
+          {.625\pgfphysicalheight - 0.2\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.25\pgfphysicalwidth}{.625\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{4}
     {%
@@ -2281,7 +2543,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.25\pgfphysicalheight,%
-      center=\pgfpoint{.75\pgfphysicalwidth}{.625\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.75\pgfphysicalwidth - 0.333\beamerswitch@margin}%
+          {.625\pgfphysicalheight - 0.2\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.75\pgfphysicalwidth}{.625\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{5}
     {%
@@ -2289,7 +2556,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.25 \pgfphysicalheight,%
-      center=\pgfpoint{.25\pgfphysicalwidth}{.375\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.25\pgfphysicalwidth + 0.333\beamerswitch@margin}%
+          {.375\pgfphysicalheight + 0.2\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.25\pgfphysicalwidth}{.375\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{6}
     {%
@@ -2297,7 +2569,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.25 \pgfphysicalheight,%
-      center=\pgfpoint{.75\pgfphysicalwidth}{.375\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.75\pgfphysicalwidth - 0.333\beamerswitch@margin}%
+          {.375\pgfphysicalheight + 0.2\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.75\pgfphysicalwidth}{.375\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{7}
     {%
@@ -2305,7 +2582,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.25 \pgfphysicalheight,%
-      center=\pgfpoint{.25\pgfphysicalwidth}{.125\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.25\pgfphysicalwidth + 0.333\beamerswitch@margin}%
+          {.125\pgfphysicalheight + 0.6\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.25\pgfphysicalwidth}{.125\pgfphysicalheight}%
+      }%
     }%
     \pgfpageslogicalpageoptions{8}
     {%
@@ -2313,7 +2595,12 @@ suggestions for improvements or new features to the
       border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.25 \pgfphysicalheight,%
-      center=\pgfpoint{.75\pgfphysicalwidth}{.125\pgfphysicalheight}%
+      center=\ifbool{HL@beamerswitch@align}{%
+        \pgfpoint{.75\pgfphysicalwidth - 0.333\beamerswitch@margin}%
+          {.125\pgfphysicalheight + 0.6\beamerswitch@margin}%
+      }{%
+        \pgfpoint{.75\pgfphysicalwidth}{.125\pgfphysicalheight}%
+      }%
     }%
     \fi
   }
