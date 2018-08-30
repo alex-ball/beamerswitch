@@ -1083,7 +1083,7 @@ using the following command in the preamble.
   so you may end up with empty boxes on the last page.
 \end{docKey}
 
-\begin{docKey}{margin}{=\meta{length}}{default 5mm, initially 5mm}
+\begin{docKey}{margin}{=\meta{length}}{default 0pt, initially 5mm}
   Sets how much extra space to leave around each slide on the page. To achieve
   this it uses the \key{border shrink} option from \pkg{pgfpages}. If you add
   page numbers, this value will increase if necessary to prevent the number
@@ -2219,7 +2219,7 @@ suggestions for improvements or new features to the
 %    \begin{macrocode}
 \newlength{\beamerswitch@margin}
 \setlength{\beamerswitch@margin}{5mm}
-\define@key[HL]{beamerswitch}{margin}[5mm]{%
+\define@key[HL]{beamerswitch}{margin}[0pt]{%
   \setlength{\beamerswitch@margin}{#1}%
 }
 %    \end{macrocode}
@@ -2244,25 +2244,25 @@ suggestions for improvements or new features to the
   \only<handout>{%
     \setkeys[HL]{beamerswitch}{#1}%
     \ifcase\value{beamerswitch@nupcase}\relax
-      \def\beamerswitch@nup{2}
+      \def\beamerswitch@nup{2}%
       \pgfpagesuselayout{1 by 2}[\beamerswitch@handoutpaper,border shrink=\the\beamerswitch@margin]%
     \or
-      \def\beamerswitch@nup{3}
+      \def\beamerswitch@nup{3}%
       \pgfpagesuselayout{1 by 3}[\beamerswitch@handoutpaper,border shrink=\the\beamerswitch@margin]%
     \or
-      \def\beamerswitch@nup{3}
+      \def\beamerswitch@nup{3}%
       \pgfpagesuselayout{1 by 3 narrow}[\beamerswitch@handoutpaper,border shrink=\the\beamerswitch@margin]%
     \or
-      \def\beamerswitch@nup{4}
+      \def\beamerswitch@nup{4}%
       \pgfpagesuselayout{2 by 2}[\beamerswitch@handoutpaper,landscape,border shrink=\the\beamerswitch@margin]%
     \or
-      \def\beamerswitch@nup{4}
+      \def\beamerswitch@nup{4}%
       \pgfpagesuselayout{1 by 4 narrow}[\beamerswitch@handoutpaper,border shrink=\the\beamerswitch@margin]%
     \or
-      \def\beamerswitch@nup{6}
+      \def\beamerswitch@nup{6}%
       \pgfpagesuselayout{2 by 3}[\beamerswitch@handoutpaper,border shrink=\the\beamerswitch@margin]%
     \or
-      \def\beamerswitch@nup{8}
+      \def\beamerswitch@nup{8}%
       \pgfpagesuselayout{2 by 4}[\beamerswitch@handoutpaper,border shrink=\the\beamerswitch@margin]%
     \fi
     \ifbool{HL@beamerswitch@pnos}{%
@@ -2285,12 +2285,12 @@ suggestions for improvements or new features to the
 %\end{macro}
 %\end{macro}
 %
-% We initialize the class with a layout of six slides on A4 paper.
+% We initialize the class with the defaults set above.
 %
 %    \begin{macrocode}
-\AtEndPreamble{
+\AtEndPreamble{%
   \ifdef{\beamerswitch@nup}{}{%
-    \handoutlayout{paper=a4paper,nup=6}%
+    \handoutlayout{}%
   }%
 }
 %    \end{macrocode}
