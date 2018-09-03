@@ -1076,7 +1076,8 @@ using the following command in the preamble.
 \begin{docKey}{pnos}{}{no value, initially unset}
   Adds page numbers to the bottom of each page. The number appears at a distance
   of \cs{handoutpnobaseline} (initially 5mm) from the bottom edge of the page.
-  You change this with \cs{setlength}.
+  You can change this before calling \cs{handoutlayout}, if you like, using the
+  usual mechanisms (e.g.\@ \cs{setlength}).
 \end{docKey}
 
 \begin{docKey}{border}{=\meta{length}}{default 0.4pt, initially 0pt}
@@ -1089,7 +1090,7 @@ using the following command in the preamble.
   Sets how much extra space to leave around each slide on the page. To achieve
   this it uses the \key{border shrink} option from \pkg{pgfpages}. If you add
   page numbers, this value will increase if necessary to prevent the number
-  colliding with the slides.
+  colliding with the slides, so treat it as a minimum.
 \end{docKey}
 
 \begin{docKey}{align}{}{no value, initially unset}
@@ -1628,10 +1629,25 @@ suggestions for improvements or new features to the
 %    \begin{macrocode}
 \newlength{\handoutpnobaseline}
 \setlength{\handoutpnobaseline}{5mm}
+\newcounter{handoutpno}
 \define@boolkey[HL]{beamerswitch}{pnos}[true]{}
 %    \end{macrocode}
 % \end{macro}
 % \end{optionkey}
+%
+% \begin{macro}{beamerswitch@footer}
+% In order to implement the page numbers, we need to add a hook to the
+% \pkg{pgfpages} shipout routine.
+%
+%    \begin{macrocode}
+\def\beamerswitch@footer{}
+\patchcmd{\pgfpages@buildshipoutbox}{%
+  \pgfsys@endpicture
+}{%
+  \beamerswitch@footer\pgfsys@endpicture
+}{}{}
+%    \end{macrocode}
+% \end{macro}
 %
 % \begin{macro}{handoutlayout}
 % \begin{macro}{beamerswitch@nup}
@@ -1644,13 +1660,17 @@ suggestions for improvements or new features to the
     \setlength{\beamerswitch@pnoadjust}{1em}%
     \setkeys[HL]{beamerswitch}{#1}%
     \ifbool{HL@beamerswitch@pnos}{%
-      \def\pgfsys@endpicture{%
-        \raisebox{\the\handoutpnobaseline}[0pt][0pt]{%
-          \makebox[\pgfphysicalwidth]{%
-            \the\numexpr(\value{page} - 2 + (\beamerswitch@nup / 2))%
-              / \beamerswitch@nup\relax
-          }%
-        }\par
+      \def\beamerswitch@footer{%
+        \stepcounter{handoutpno}%
+        \setbox0\vbox{\makebox[0pt][c]{\arabic{handoutpno}}}%
+        \pgfsys@beginscope
+        \pgflowlevel{\pgftransformshift{\pgfpoint{.5\pgfphysicalwidth}{\handoutpnobaseline}}}%
+        \pgflowlevel{\pgftransformyshift{\ht0}}%
+        \ht0=0pt%
+        \wd0=0pt%
+        \dp0=0pt%
+        \pgfsys@hbox0%
+        \pgfsys@endscope
       }%
       \ifbool{HL@beamerswitch@align}{%
         \ifcase\value{beamerswitch@nupcase}\relax
@@ -1675,7 +1695,7 @@ suggestions for improvements or new features to the
           {\the\dimexpr\handoutpnobaseline + \beamerswitch@pnoadjust\relax}%
       }{}%
     }{%
-      \def\pgfsys@endpicture{}%
+      \def\beamerswitch@footer{}%
     }%
     \ifcase\value{beamerswitch@nupcase}\relax
       \def\beamerswitch@nup{2}%
