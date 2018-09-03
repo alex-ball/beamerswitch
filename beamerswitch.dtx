@@ -1665,10 +1665,8 @@ suggestions for improvements or new features to the
         \setbox0\vbox{\makebox[0pt][c]{\arabic{handoutpno}}}%
         \pgfsys@beginscope
         \pgflowlevel{\pgftransformshift{\pgfpoint{.5\pgfphysicalwidth}{\handoutpnobaseline}}}%
-        \pgflowlevel{\pgftransformyshift{\ht0}}%
-        \ht0=0pt%
         \wd0=0pt%
-        \dp0=0pt%
+        \dp0=-\ht0%
         \pgfsys@hbox0%
         \pgfsys@endscope
       }%
