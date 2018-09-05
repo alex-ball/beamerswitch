@@ -93,7 +93,7 @@ first three steps.
 
 ## Licence
 
-Copyright 2016–2017 Alex Ball.
+Copyright 2016–2018 Alex Ball.
 
 This work consists of the file beamerswitch.dtx and a Makefile.
 
@@ -135,10 +135,10 @@ This work is "maintained" (as per LPPL maintenance status) by
   \begin{frame}
     \maketitle
   \end{frame}
-  
+
   This very brief demonstration shows how to use the \textsf{beamerswitch} class.
   It allows easy switching between four \textsf{beamer} modes:
-  
+
   \begin{frame}{Beamer modes}
     \begin{itemize}[<+->]
       \item \textbf{beamer:} regular slides
@@ -148,9 +148,9 @@ This work is "maintained" (as per LPPL maintenance status) by
         document based on the slides
     \end{itemize}
   \end{frame}
-  
+
   Notice how the text outside frames is only shown in article mode. Also,
-  
+
   \begin{frame}{Features shown in this example}
     \begin{itemize}[<+->]
       \item Different class options are passed to the \textsf{beamer} and
@@ -160,13 +160,13 @@ This work is "maintained" (as per LPPL maintenance status) by
       \item The handout has three slides to a page with room for handwritten
         notes at the side, and is in black and white.
     \end{itemize}
-    
+
     \uncover<+->{See the source code of this example to see how it was done.}
   \end{frame}
-  
+
   This PDF also has title and author information saved in the metadata (look
   at the properties in your PDF viewer).
-  
+
   Happy {\LaTeX}ing!
 \end{document}
 %</example>
@@ -193,7 +193,7 @@ See:     http://www.latex-project.org/lppl.txt
 \endpreamble
 \postamble
 
-Copyright (C) 2016-2017 by Alex Ball <a.j.ball@bath.ac.uk>
+Copyright (C) 2016-2018 by Alex Ball <a.j.ball@bath.ac.uk>
 \endpostamble
 
 \usedir{tex/latex/\jobname}
@@ -228,7 +228,7 @@ Copyright (C) 2016-2017 by Alex Ball <a.j.ball@bath.ac.uk>
 %<class>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<class>\ProvidesClass{beamerswitch}
 %<*class>
-    [2018/08/29 v1.4 Convenient mode selection in Beamer documents]
+    [2018/09/05 v1.4.1 Convenient mode selection in Beamer documents]
 %</class>
 %<*driver>
 \documentclass[12pt]{article}
@@ -617,7 +617,7 @@ with \pkg{pgfpages} to get several slides on a single side of A4 (or Letter)
 paper.
 
 Beamer can also produce a double-height or double-width slide set, with the
-intention that each half will be shown on a different display (e.g. one for
+intention that each half will be shown on a different display (e.g.\@ one for
 the audience, one for the speaker). There are three variations of this,
 activated using \cs{setbeameroption}:
 
@@ -1664,7 +1664,8 @@ suggestions for improvements or new features to the
         \stepcounter{handoutpno}%
         \setbox0\vbox{\makebox[0pt][c]{\arabic{handoutpno}}}%
         \pgfsys@beginscope
-        \pgflowlevel{\pgftransformshift{\pgfpoint{.5\pgfphysicalwidth}{\handoutpnobaseline}}}%
+        \pgflowlevel{\pgftransformshift{%
+          \pgfpoint{.5\pgfphysicalwidth}{\handoutpnobaseline}}}%
         \wd0=0pt%
         \dp0=-\ht0%
         \pgfsys@hbox0%
@@ -2795,7 +2796,8 @@ suggestions for improvements or new features to the
       \ifundef{\beamer@originstitute}{%
         \renewcommand{\institute}[2][]{\def\insertinstitute{##2}}%
       }{%
-        \renewcommand{\institute}[2][]{\def\insertinstitute{##2}\beamer@originstitute{##2}}%
+        \renewcommand{\institute}[2][]{%
+          \def\insertinstitute{##2}\beamer@originstitute{##2}}%
       }%
 %    \end{macrocode}
 %
