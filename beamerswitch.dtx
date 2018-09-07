@@ -1584,7 +1584,14 @@ suggestions for improvements or new features to the
 \define@key[HL]{beamerswitch}{border}[0.4pt]{%
   \RequirePackage{pgf}%
   \ifdimcomp{#1}{>}{0pt}{%
-    \renewcommand*{\beamerswitch@Border}{\pgfsetlinewidth{#1}\pgfstroke}%
+    \renewcommand*{\beamerswitch@Border}{%
+      \ifnumcomp{(\value{handoutpno} * \beamerswitch@nup) + \the\pgf@cpn}%
+        {>}{\beamer@endpageofdocument}{%
+        \relax
+      }{%
+        \pgfsetlinewidth{#1}\pgfstroke
+      }%
+    }%
   }{%
     \renewcommand*{\beamerswitch@Border}{\relax}%
   }%
@@ -1694,7 +1701,7 @@ suggestions for improvements or new features to the
           {\the\dimexpr\handoutpnobaseline + \beamerswitch@pnoadjust\relax}%
       }{}%
     }{%
-      \def\beamerswitch@footer{}%
+      \def\beamerswitch@footer{\stepcounter{handoutpno}}%
     }%
     \ifcase\value{beamerswitch@nupcase}\relax
       \def\beamerswitch@nup{2}%
