@@ -331,9 +331,10 @@ Copyright (C) 2016-2019 by Alex Ball <ab318@bath.ac.uk>
 \newcommand*{\env}[1]{\textcolor{Environment}{\ttfamily #1}}
 \newcommand*{\key}[1]{\textcolor{Option}{\ttfamily #1}}
 \newcommand*{\val}[1]{\textcolor{Value}{\ttfamily #1}}
+
 \makeatletter
 \renewenvironment{macro}[1]{%
-  \def\MyName{#1}%
+  \StrSubstitute{#1}{\detokenize{@}}{"@}[\MyName]%
   \edef\saved@macroname{\expandafter\string\csname #1\endcsname}%
   \let\saved@indexname\saved@macroname
   \index{\MyName @\tcbIndexPrintComC {\MyName}|(emph}%
@@ -344,7 +345,7 @@ Copyright (C) 2016-2019 by Alex Ball <ab318@bath.ac.uk>
   \index{\MyName @\tcbIndexPrintComC {\MyName}|)}%
 }
 \renewenvironment{environment}[1]{%
-  \def\MyName{#1}%
+  \StrSubstitute{#1}{\detokenize{@}}{"@}[\MyName]%
   \edef\saved@macroname{#1}%
   \let\saved@indexname\saved@macroname
   \index{\MyName @\tcbIndexPrintEnvCA {\MyName}|(emph}%
