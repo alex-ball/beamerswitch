@@ -14,9 +14,11 @@ all:	$(NAME).pdf $(NAME)-example.pdf clean
 $(NAME).cls $(NAME)-example.tex: $(NAME).dtx
 	tex -interaction=batchmode $(NAME).dtx >/dev/null
 $(NAME).pdf: $(NAME).dtx
-	latexmk -silent -lualatex -synctex=1 -shell-escape -interaction=batchmode $(NAME).dtx >/dev/null
+	lualatex -shell-escape -recorder -interaction=batchmode $(NAME).dtx >/dev/null
+	if [ -f $(NAME).glo ]; then makeindex -q -s gglo.ist -o $(NAME).gls $(NAME).glo; fi
+	latexmk -silent -pdflua -shell-escape -interaction=batchmode $(NAME).dtx >/dev/null
 $(NAME)-example.pdf $(NAME)-example-trans.pdf $(NAME)-example-handout.pdf $(NAME)-example-article.pdf: $(NAME).cls $(NAME)-example.tex
-	latexmk -silent -lualatex -synctex=1 -shell-escape -interaction=batchmode $(NAME)-example.tex >/dev/null
+	latexmk -silent -pdflua -shell-escape -interaction=batchmode $(NAME)-example.tex >/dev/null
 clean:
 	rm -f $(NAME){,-example,-example-article,-example-handout,-example-trans}.{aux,bbl,bcf,blg,doc,fdb_latexmk,fls,glo,gls,hd,idx,ilg,ind,listing,log,nav,out,run.xml,snm,synctex.gz,tcbtemp,toc,vrb}
 	rm -rf _minted-$(NAME)
