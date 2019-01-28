@@ -1583,7 +1583,7 @@ suggestions for improvements or new features to the
 % This is implemented as a PGF drawing command, which is initially set up to do
 % nothing but gets filled out if the option is selected. As part of this, we
 % calculate the number of the current slide (|handoutpno| gives the current page
-% number minus one; \refCom{beamerswitch@nup} is the number of slides per page;
+% number minus one; \cs{beamerswitch@nup} is the number of slides per page;
 % and \cs{pgf@cpn} gives the count of the current slide on the current page).
 % If this exceeds the total number of slides, we suppress the border.
 %
@@ -1665,8 +1665,23 @@ suggestions for improvements or new features to the
 % \end{macro}
 %
 % \begin{macro}{handoutlayout}
-% \begin{macro}{beamerswitch@nup}
+% \begin{macro}{beamerswitch@pnoadjust}
 % We set up the \cs{handoutlayout} command for applying these options.
+%
+% The hook \cs{beamerswitch@footer} is used to step the page number
+% counter |handoutpno|; if page numering is active, it also places the
+% number on the page centered and \cs{handoutpnobaseline} up from the
+% bottom.
+%
+% The length \cs{beamerswitch@pnoadjust} is, conceptually, the height
+% of the page number. When page numbers are active, the margin around
+% slides is automatically increased to guarantee that the top of the
+% page number will not be higher than the bottom of the lowest slide.
+% Currently this does not account for extra whitespace arising from
+% aspect ratio issues. When the \key{align} option is active, the margin
+% at the bottom of the page is increased, but to save a register we
+% make the adjustment to \cs{beamerswitch@pnoadjust} instead of a copy
+% of \cs{beamerswitch@margin}.
 %
 %    \begin{macrocode}
 \newlength{\beamerswitch@pnoadjust}
@@ -1711,6 +1726,16 @@ suggestions for improvements or new features to the
     }{%
       \def\beamerswitch@footer{\stepcounter{handoutpno}}%
     }%
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{beamerswitch@nup}
+% The value of the \key{nup} option is used both to select the layout
+% and set the value of \cs{beamerswitch@nup}. The latter is used to
+% suppress unwanted borders and check if \cs{handoutlayout} has been
+% called.
+%
+%    \begin{macrocode}
     \ifcase\value{beamerswitch@nupcase}\relax
       \def\beamerswitch@nup{2}%
       \pgfpagesuselayout{1 by 2}[\beamerswitch@handoutpaper,%
