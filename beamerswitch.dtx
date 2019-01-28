@@ -1581,7 +1581,11 @@ suggestions for improvements or new features to the
 % is used to set the width of the border.
 %
 % This is implemented as a PGF drawing command, which is initially set up to do
-% nothing but gets filled out if the option is selected.
+% nothing but gets filled out if the option is selected. As part of this, we
+% calculate the number of the current slide (|handoutpno| gives the current page
+% number minus one; \refCom{beamerswitch@nup} is the number of slides per page;
+% and \cs{pgf@cpn} gives the count of the current slide on the current page).
+% If this exceeds the total number of slides, we suppress the border.
 %
 %    \begin{macrocode}
 \newcommand*{\beamerswitch@Border}{\relax}
@@ -2326,6 +2330,7 @@ suggestions for improvements or new features to the
     \pgfpageslogicalpageoptions{1}
     {%
       border shrink=\pgfpageoptionborder,%
+      border code=\beamerswitch@Border,%
       resized width=.5\pgfphysicalwidth,%
       resized height=.333\pgfphysicalheight,%
       center=\ifbool{HL@beamerswitch@align}{%
