@@ -228,7 +228,7 @@ Copyright (C) 2016-2019 by Alex Ball <ab318@bath.ac.uk>
 %<class>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<class>\ProvidesClass{beamerswitch}
 %<*class>
-    [2019/01/28 v1.5 Convenient mode selection in Beamer documents]
+    [2019/06/06 v1.6 Convenient mode selection in Beamer documents]
 %</class>
 %<*driver>
 \documentclass[12pt]{article}
@@ -1402,20 +1402,36 @@ suggestions for improvements or new features to the
 % \end{macro}
 % \end{macro}
 %
+% \begin{macro}{JobName}
+% \changes{v1.6}{2019/06/06}{Fix bug triggered by spaces in job names.}
 % We check for special jobnames and use them to override the above mode-related
-% options. Note that if this happens, the \key{also*} options are ignored.
+% options. In certain circumstances, the jobname is wrapped in quote marks, so
+% in that case we strip them off before running the tests.
 %
 %    \begin{macrocode}
-\IfEndWith*{\jobname}{\BeamerSuffix}{%
+\IfBeginWith*{\jobname}{"}{%
+  \IfEndWith*{\jobname}{"}{%
+    \StrGobbleLeft{\jobname}{1}[\JobName]%
+    \StrGobbleRight{\JobName}{1}[\JobName]%
+  }{\let\JobName\jobname}%
+}{\let\JobName\jobname}
+%    \end{macrocode}
+% \end{macro}
+%
+% Now we run the tests. Note that the \key{also*} options are only acted upon
+% if the all the tests fail.
+%
+%    \begin{macrocode}
+\IfEndWith*{\JobName}{\BeamerSuffix}{%
   \setkeys[DC]{beamerswitch}{beamer=true}
 }{%
-  \IfEndWith*{\jobname}{\TransSuffix}{%
+  \IfEndWith*{\JobName}{\TransSuffix}{%
     \setkeys[DC]{beamerswitch}{trans=true}
   }{%
-    \IfEndWith*{\jobname}{\HandoutSuffix}{%
+    \IfEndWith*{\JobName}{\HandoutSuffix}{%
       \setkeys[DC]{beamerswitch}{handout=true}
     }{%
-      \IfEndWith*{\jobname}{\ArticleSuffix}{%
+      \IfEndWith*{\JobName}{\ArticleSuffix}{%
         \setkeys[DC]{beamerswitch}{article=true}
       }{%
         \ifbool{DC@beamerswitch@alsobeamer}{%
