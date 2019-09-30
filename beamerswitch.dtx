@@ -2727,7 +2727,7 @@ suggestions for improvements or new features to the
   \NewDocumentCommand{\bsw@punct@test}{m}{\l_bsw_punct_test:n {#1}}
   \cs_new_protected:Nn \l_bsw_punct_test:n
   {
-    \str_case_x:nnTF { \str_item:nn {#1} {-1} }
+    \str_case_e:nnTF { \str_item:nn {#1} {-1} }
       {
         { , } { }
         { ; } { }
