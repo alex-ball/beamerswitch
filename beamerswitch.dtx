@@ -917,7 +917,7 @@ using the following command in the preamble.
   \key{resize to} layout.
 \end{docKey}
 
-\begin{docKey}{nup}{=\val{2}\textbar \val{3}\textbar \val{3plus}\textbar \val{4}\textbar \val{4plus}\textbar \val{6}\textbar \val{8}}{no default, initially \val{6}}
+\begin{docKey}{nup}{=\val{1}\textbar \val{2}\textbar \val{3}\textbar \val{3plus}\textbar \val{4}\textbar \val{4plus}\textbar \val{6}\textbar \val{8}}{no default, initially \val{6}}
   Selects how many slides are shown on a single page in \key{handout} mode.
   The `plus' layouts leave blank space for recipients to make handwritten notes
   next to each slide. The effects of the various values are shown in Figure~\ref{fig:layouts} on page~\pageref{fig:layouts}. Note that the \docValue{2},
@@ -962,7 +962,19 @@ using the following command in the preamble.
   ,#1
 }
 \begin{figure}[t!]
+  \newcounter{subfig}%
+  \def\sfno{\rule[-\bigskipamount]{0pt}{1em}\stepcounter{subfig}(\alph{subfig})\space}%
   \centering
+  \begin{minipage}[b]{11em}
+    \centering
+    \begin{pseudopage}[width=10em,height=7.1em]
+      \begin{pseudoslide}[width=8em,height=6em]
+        \texttt{1}
+      \end{pseudoslide}
+    \end{pseudopage}
+    \par
+    \sfno\key{nup}=\val{1}
+  \end{minipage}
   \begin{minipage}[b]{11em}
     \centering
     \begin{pseudopage}
@@ -974,7 +986,7 @@ using the following command in the preamble.
       \end{pseudoslide}
     \end{pseudopage}
     \par
-    (a) \key{nup}=\val{2}
+    \sfno\key{nup}=\val{2}
   \end{minipage}
   \begin{minipage}[b]{11em}
     \centering
@@ -992,7 +1004,7 @@ using the following command in the preamble.
       \end{pseudowideslide}
     \end{pseudopage}
     \par
-    (b) \key{nup}=\val{3}
+    \sfno\key{nup}=\val{3}
   \end{minipage}
   \begin{minipage}[b]{11em}
     \centering
@@ -1004,9 +1016,8 @@ using the following command in the preamble.
       \begin{pseudoslide}\texttt{3}\end{pseudoslide}
     \end{pseudopage}
     \par
-    (c) \key{nup}=\val{3plus}
+    \sfno\key{nup}=\val{3plus}
   \end{minipage}
-  \par\bigskip
   \begin{minipage}[b]{11em}
     \centering
     \begin{pseudopage}[width=10em,height=7.1em]
@@ -1024,7 +1035,7 @@ using the following command in the preamble.
       \end{pseudoslide}
     \end{pseudopage}
     \par
-    (d) \key{nup}=\val{4}
+    \sfno\key{nup}=\val{4}
   \end{minipage}
   \begin{minipage}[b]{11em}
     \centering
@@ -1038,7 +1049,7 @@ using the following command in the preamble.
       \begin{pseudowideslide}\texttt{4}\end{pseudowideslide}
     \end{pseudopage}
     \par
-    (e) \key{nup}=\val{4plus}
+    \sfno\key{nup}=\val{4plus}
   \end{minipage}
   \begin{minipage}[b]{11em}
     \centering
@@ -1053,9 +1064,8 @@ using the following command in the preamble.
       \begin{pseudoslide}\texttt{6}\end{pseudoslide}
     \end{pseudopage}
     \par
-    (f) \key{nup}=\val{6}
+    \sfno\key{nup}=\val{6}
   \end{minipage}
-  \par\bigskip
   \begin{minipage}[b]{11em}
     \centering
     \begin{pseudopage}
@@ -1072,9 +1082,9 @@ using the following command in the preamble.
       \begin{pseudowideslide}\texttt{8}\end{pseudowideslide}
     \end{pseudopage}
     \par
-    (g) \key{nup}=\val{8}
+    \sfno\key{nup}=\val{8}
   \end{minipage}
-  \par
+  \\
   \caption{Handout layouts provided by \pkg{beamerswitch}}
   \label{fig:layouts}
 \end{figure}
@@ -1561,6 +1571,7 @@ suggestions for improvements or new features to the
 % \end{optionkey}
 %
 % \begin{optionkey}{nup}
+% \begin{optionvalue}{1}
 % \begin{optionvalue}{2}
 % \begin{optionvalue}{3}
 % \begin{optionvalue}{3plus}
@@ -1573,14 +1584,15 @@ suggestions for improvements or new features to the
 %
 %    \begin{macrocode}
 \newcounter{beamerswitch@nupcase}
-\setcounter{beamerswitch@nupcase}{5}
-\define@choicekey+[HL]{beamerswitch}{nup}[\val\nr]{2, 3, 3plus, 4, 4plus, 6, 8}{%
+\setcounter{beamerswitch@nupcase}{6}
+\define@choicekey+[HL]{beamerswitch}{nup}[\val\nr]{1, 2, 3, 3plus, 4, 4plus, 6, 8}{%
   \setcounter{beamerswitch@nupcase}{\nr}
 }{%
   \ClassWarning{beamerswitch}{Value of `nup' not recognized.
-    Allowed values are 2, 3, 3plus, 4, 4plus, 6, and 8.}%
+    Allowed values are 1, 2, 3, 3plus, 4, 4plus, 6, and 8.}%
 }
 %    \end{macrocode}
+% \end{optionvalue}
 % \end{optionvalue}
 % \end{optionvalue}
 % \end{optionvalue}
@@ -1720,6 +1732,8 @@ suggestions for improvements or new features to the
       }%
       \ifbool{HL@beamerswitch@align}{%
         \ifcase\value{beamerswitch@nupcase}\relax
+          \relax
+        \or
           \addtolength{\beamerswitch@pnoadjust}{-0.333\beamerswitch@margin}%
         \or
           \addtolength{\beamerswitch@pnoadjust}{-0.5\beamerswitch@margin}%
@@ -1754,6 +1768,10 @@ suggestions for improvements or new features to the
 %
 %    \begin{macrocode}
     \ifcase\value{beamerswitch@nupcase}\relax
+      \def\beamerswitch@nup{1}%
+      \pgfpagesuselayout{1 by 1}[\beamerswitch@handoutpaper,%
+        landscape,border shrink=\the\beamerswitch@margin]%
+    \or
       \def\beamerswitch@nup{2}%
       \pgfpagesuselayout{1 by 2}[\beamerswitch@handoutpaper,%
         border shrink=\the\beamerswitch@margin]%
@@ -1801,10 +1819,40 @@ suggestions for improvements or new features to the
 % Though \pkg{pgfpages} defines some perfectly fine layouts, we need to add
 % configurability to the existing ones and provide some new ones.
 %
-% The `1 by 2' layout is similar to the normal \key{2 on 1} layout.
+% The `1 by 1' layout has a single slide per page.
 %
 %    \begin{macrocode}
 \mode<handout>{%
+  \pgfpagesdeclarelayout{1 by 1}
+  {
+    \edef\pgfpageoptionheight{\the\paperheight}
+    \edef\pgfpageoptionwidth{\the\paperwidth}
+    \edef\pgfpageoptionborder{0pt}
+    \def\pgfpageoptionfirstshipout{1}
+  }
+  {
+    \pgfpagesphysicalpageoptions
+    {%
+      logical pages=1,%
+      physical height=\pgfpageoptionheight,%
+      physical width=\pgfpageoptionwidth,%
+      current logical shipout=\pgfpageoptionfirstshipout%
+    }
+    \pgfpageslogicalpageoptions{1}
+    {%
+      border shrink=\pgfpageoptionborder,%
+      border code=\beamerswitch@Border,%
+      scale=2.25,%
+      resized width=\pgfphysicalwidth,%
+      resized height=\pgfphysicalheight,%
+      center=\pgfpoint{.5\pgfphysicalwidth}{.5\pgfphysicalheight}%
+    }%
+  }%
+%    \end{macrocode}
+%
+% The `1 by 2' layout is similar to the normal \key{2 on 1} layout.
+%
+%    \begin{macrocode}
   \pgfpagesdeclarelayout{1 by 2}
   {
     \edef\pgfpageoptionheight{\the\paperwidth} % landscaped by default
