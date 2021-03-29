@@ -893,13 +893,6 @@ directives:
   load \pkg{hyperref} yourself at a different point, use this option.
 \end{docKey}
 
-\pagebreak % TWEAK: may not be needed in future versions
-\begin{docKey}{textinst}{}{no value, initially unset}
-  In all modes, patches the \cs{inst} command so that it prints its argument
-  using \cs{textsuperscript} instead of a mathematical superscript. This helps
-  avoid unnecessary font changes.
-\end{docKey}
-
 \section{Setting the layout of the handouts}
 
 The class provides a simplified interface to the \pkg{pgfpages} package. By
@@ -1170,6 +1163,13 @@ preamble.
 \end{dispListing}
 \end{docKey}
 
+\begin{docKey}{instbreak}{=\meta{definition}}{no default, initially \cs{linebreak}}
+   In \key{article} mode, defines how \cs{and} is rendered when
+   \cs{insertinstitute} is used (such when the \key{maketitle} option is
+   active). Another good \meta{definition} to use might be \cs{quad}.
+\end{docKey}
+
+
 \section{Tips for further configuration}
 
 There are some other ways to customize the behaviour of the various modes.
@@ -1344,8 +1344,8 @@ suggestions for improvements or new features to the
 % \end{optionkey}
 %
 % \begin{optionkey}{textinst}
-% The \key{textinst} option adjusts the superscript used for institution
-% markers.
+% The \key{textinst} option enforces \cs{textsuperscript} for institution
+% markers. Recent versions of \pkg{beamer} do this by default.
 %
 %    \begin{macrocode}
 \define@boolkey[DC]{beamerswitch}{textinst}[true]{}
@@ -1480,12 +1480,26 @@ suggestions for improvements or new features to the
 % For article mode, we load the \pkg{article} class and the \pkg{beamerarticle}
 % support package. Apologies for anyone hoping for \pkg{scrartcl} or
 % \pkg{memoir} alternatives.
+% \begin{macro}{beamer@insttitle}
+% \begin{macro}{beamer@andtitle}
+% \begin{macro}{beamer@instinst}
+% \begin{macro}{beamer@andinst}
+% We also add some beamer base macros that are needed for the
+%\cs{insertinstitute} command.
 %
 %    \begin{macrocode}
 \ifbool{DC@beamerswitch@article}{%
   \LoadClass{article}
   \RequirePackage{beamerarticle}
+  \def\beamer@insttitle#1{\textsuperscript{#1}}
+  \def\beamer@andtitle{\quad}
+  \def\beamer@instinst#1{\textsuperscript{#1}\ignorespaces}
+  \def\beamer@andinst{\linebreak}
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 %
 % It seems as though \pkg{beamerarticle} expects \pkg{hyperref} to be loaded,
 % but doesn't actually do it itself. So we oblige, using the default options
@@ -1556,8 +1570,10 @@ suggestions for improvements or new features to the
 %
 % \subsection{Mode-independent layout}
 %
+% \begin{macro}{beamer@insttitle}
+% \begin{macro}{beamer@instinst}
 % We implement the option that formats institution markers in text mode rather
-% than math mode.
+% than math mode in older versions of \pkg{beamer}.
 %
 %    \begin{macrocode}
 \ifbool{DC@beamerswitch@textinst}{%
@@ -1565,6 +1581,8 @@ suggestions for improvements or new features to the
   \def\beamer@instinst#1{\textsuperscript{#1}\ignorespaces}
 }{}
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 %
 % \subsection{Handout layout}
 %
@@ -2915,6 +2933,19 @@ suggestions for improvements or new features to the
 % \end{optionvalue}
 % \end{optionkey}
 %
+% \begin{optionkey}{instbreak}
+% \begin{macro}{beamerswitch@andinst}
+% We offer an easy way of customizing how institutes are strung together.
+%
+%    \begin{macrocode}
+\let\beamerswitch@andinst\beamer@andinst
+\define@key[AL]{beamerswitch}{instbreak}{%
+  \def\beamerswitch@andinst{#1}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{optionkey}
+%
 % \begin{macro}{articlelayout}
 % We provide a command for setting these options.
 %
@@ -2963,6 +2994,12 @@ suggestions for improvements or new features to the
 % \end{optionvalue}
 % \end{optionvalue}
 %
+% This is where the \key{instbreak} option takes effect.
+%
+%    \begin{macrocode}
+    \let\beamer@andinst\beamerswitch@andinst
+%    \end{macrocode}
+%
 % This is where we make our adjustments to \cs{maketitle}. We start by joining
 % the subtitle to the title by means of a colon instead of a newline.
 %
@@ -2977,10 +3014,12 @@ suggestions for improvements or new features to the
 %
 %    \begin{macrocode}
       \ifundef{\beamer@originstitute}{%
-        \renewcommand{\institute}[2][]{\def\insertinstitute{##2}}%
+        \renewcommand{\institute}[2][]{%
+          \def\insertinstitute{\def\inst{\beamer@instinst}\def\and{\beamer@andinst}##2}}%
       }{%
         \renewcommand{\institute}[2][]{%
-          \def\insertinstitute{##2}\beamer@originstitute{##2}}%
+          \def\insertinstitute{\def\inst{\beamer@instinst}\def\and{\beamer@andinst}##2}%
+          \beamer@originstitute{##2}}%
       }%
 %    \end{macrocode}
 %
@@ -2998,21 +3037,28 @@ suggestions for improvements or new features to the
           \vskip 1.5em%
           {%
             \large\lineskip .5em%
+%    \end{macrocode}
+%
+% The second is to add the beamer definitions for \cs{inst} and \cs{and} in the
+% author row.
+%
+%    \begin{macrocode}
             \begin{tabular}[t]{c}%
+              \def\inst{\beamer@insttitle}\def\and{\beamer@andtitle}%
               \@author
             \end{tabular}\par
           }%
 %    \end{macrocode}
 %
-% The other is to add in a row for the institute information.
+% The third is to add in a row for the institute information.
 %
 %    \begin{macrocode}
           \ifdefvoid{\insertinstitute}{}{%
             {%
               \normalsize\lineskip .5em%
-              \begin{tabular}[t]{c}%
+              \begin{center}
                 \insertinstitute
-              \end{tabular}\par
+              \end{center}\par
             }%
           }%
           \vskip 1em%
