@@ -93,7 +93,7 @@ first three steps.
 
 ## Licence
 
-Copyright 2016–2020 Alex Ball.
+Copyright 2016–2021 Alex Ball.
 
 This work consists of the file beamerswitch.dtx and a Makefile.
 
@@ -126,8 +126,8 @@ This work is "maintained" (as per LPPL maintenance status) by
 
 \title{A demonstration of the \textsf{beamerswitch} class}
 \subtitle{Testing features}
-\author{Alex Ball}
-\institute{University of Life}
+\author{Alex Ball\inst{1}}
+\institute{\inst{1}University of Life}
 \date{1 September 2016}
 \subject{A LaTeX class}
 \keywords{CTAN, literate programming}
@@ -194,7 +194,7 @@ See:     http://www.latex-project.org/lppl.txt
 \endpreamble
 \postamble
 
-Copyright (C) 2016-2020 by Alex Ball <ab318@bath.ac.uk>
+Copyright (C) 2016-2021 by Alex Ball <ab318@bath.ac.uk>
 \endpostamble
 
 \usedir{tex/latex/\jobname}
@@ -229,7 +229,7 @@ Copyright (C) 2016-2020 by Alex Ball <ab318@bath.ac.uk>
 %<class>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<class>\ProvidesClass{beamerswitch}
 %<*class>
-    [2020/06/06 v1.7 Convenient mode selection in Beamer documents]
+    [2021/04/12 v1.8 Convenient mode selection in Beamer documents]
 %</class>
 %<*driver>
 \documentclass[12pt]{article}
@@ -1395,6 +1395,7 @@ suggestions for improvements or new features to the
 %    \end{macrocode}
 % \end{optionkey}
 %
+% \changes{v1.8}{2021/04/12}{Deprecate redundant \key{textinst} option.}
 % \begin{optionkey}{textinst}
 % The \key{textinst} option enforces \cs{textsuperscript} for institution
 % markers. Recent versions of \pkg{beamer} do this by default.
@@ -1640,6 +1641,7 @@ suggestions for improvements or new features to the
 % \end{macro}
 % \end{macro}
 %
+% \begin{macro}{handoutlayout}
 % \subsection{Handout layout}
 %
 % \begin{optionkey}{paper}
@@ -1729,7 +1731,7 @@ suggestions for improvements or new features to the
 % \end{optionkey}
 %
 % \begin{optionkey}{margin}
-% \changes{v1.4}{2018/08/29}{Make margins around slides a configurable size}
+% \changes{v1.4}{2018/08/29}{Make margins around slides a configurable size.}
 % \begin{macro}{beamerswitch@margin}
 % The \key{margin} option controls how much white space is added around each
 % slide on handout pages. It corresponds to the \texttt{border shrink} option
@@ -1784,7 +1786,6 @@ suggestions for improvements or new features to the
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{handoutlayout}
 % \begin{macro}{beamerswitch@pnoadjust}
 % We set up the \cs{handoutlayout} command for applying these options.
 %
@@ -2881,6 +2882,7 @@ suggestions for improvements or new features to the
 }
 %    \end{macrocode}
 %
+% \begin{macro}{articlelayout}
 % \subsection{Article layout}
 %
 % We provide some options for configuring the appearance of article mode.
@@ -2907,7 +2909,7 @@ suggestions for improvements or new features to the
 %    \end{macrocode}
 %
 % \begin{macro}{bsw@punct@test}
-% \changes{v1.6.1}{2020/01/20}{Update expl3 syntax}
+% \changes{v1.6.1}{2020/01/20}{Update expl3 syntax.}
 % Of course, we would rather not bother the user with this, so we introduce a
 % command for testing the title for final punctuation.
 %
@@ -2989,6 +2991,7 @@ suggestions for improvements or new features to the
 % \end{optionvalue}
 % \end{optionkey}
 %
+% \changes{v1.8}{2021/04/12}{Add \key{instbreak} option.}
 % \begin{optionkey}{instbreak}
 % \begin{macro}{beamerswitch@andinst}
 % We offer an easy way of customizing how institutes are strung together.
@@ -3002,7 +3005,6 @@ suggestions for improvements or new features to the
 % \end{macro}
 % \end{optionkey}
 %
-% \begin{macro}{articlelayout}
 % We provide a command for setting these options.
 %
 %    \begin{macrocode}
@@ -3095,6 +3097,8 @@ suggestions for improvements or new features to the
             \large\lineskip .5em%
 %    \end{macrocode}
 %
+% \changes{v1.8}{2021/04/12}{Ensure proper rendering of \cs{inst} and \cs{and}
+%   in \cs{author}.}
 % The second is to add the beamer definitions for \cs{inst} and \cs{and} in the
 % author row.
 %
@@ -3112,9 +3116,7 @@ suggestions for improvements or new features to the
           \ifdefvoid{\insertinstitute}{}{%
             {%
               \normalsize\lineskip .5em%
-              \begin{center}
-                \insertinstitute
-              \end{center}\par
+              \insertinstitute\par
             }%
           }%
           \vskip 1em%
