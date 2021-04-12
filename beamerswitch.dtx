@@ -106,9 +106,10 @@ This work is "maintained" (as per LPPL maintenance status) by
 
 %</readme>
 %<*example>
-\PassOptionsToClass{a4paper,12pt}{article}
-\PassOptionsToClass{14pt}{beamer}
-\documentclass[also={trans,handout,article}]{beamerswitch}
+\documentclass[%
+  beameroptions={ignorenonframetext,14pt},
+  articleoptions={a4paper,12pt},
+  also={trans,handout,article}]{beamerswitch}
 \handoutlayout{nup=3plus,border=1pt}
 \articlelayout{maketitle,frametitles=none}
 \usepackage[british]{babel}
@@ -296,7 +297,7 @@ Copyright (C) 2016-2020 by Alex Ball <ab318@bath.ac.uk>
   \egroup
 }
 \makeatother
-\tcbuselibrary{documentation,breakable,minted}
+\tcbuselibrary{documentation,breakable,minted,raster}
 \colorlet{Option}{violet}
 \colorlet{Command}{red!75!black}
 \colorlet{Environment}{blue!75!black}
@@ -310,6 +311,12 @@ Copyright (C) 2016-2020 by Alex Ball <ab318@bath.ac.uk>
     , linenos
     , numbersep=20pt
     , firstnumber=last
+    }
+  , documentation minted options=
+    { breaklines
+    , breakbefore=\{\[
+    , breakafter=/\}\]
+    , breakbeforesymbolpre={}
     }
   , index format=pgf
   , color command=Command
@@ -524,30 +531,44 @@ If you have an existing \pkg{beamer} presentation and want convert it to use
 
 \begin{enumerate}
 \item
-  Have you specified class options other than \key{ignorenonframetext}?
-  If so, start by rewriting your \cs{documentclass} line in terms of
-  \cs{PassOptionsToClass} -- note that the optional argument (in square
-  brackets) becomes mandatory (in curly braces):
+  Replace the class \pkg{beamer} with \pkg{beamerswitch}.
 
-  \begin{multicols}{2}
+  Wrap any class options you have specified in braces and turn them into the
+  value of the \key{beameroptions} option:
+
+  \begin{tcbraster}[raster equal height=rows]
 \begin{dispListing*}{title=Before,coltitle=black,fonttitle=\sffamily}
-\documentclass[10pt]{beamer}
+\documentclass[10pt, xcolor={svgnames}]{beamer}
 \end{dispListing*}
-    \columnbreak
 \begin{dispListing*}{title=After,coltitle=black,fonttitle=\sffamily}
-\PassOptionsToClass{10pt}{beamer}
+\documentclass[beameroptions={10pt, xcolor={svgnames}}]{beamerswitch}
 \end{dispListing*}
-  \end{multicols}
+  \end{tcbraster}
 
-  Then add `\cs{documentclass}\brackets{beamerswitch}' directly below.
+  \newpage
+  If you didn't specify any options, then give \key{beameroptions} a blank
+  value:
 
-  Otherwise, simply replace your \cs{documentclass} line with the
-  \texttt{beamerswitch} one.
+  \begin{tcbraster}[raster equal height=rows]
+\begin{dispListing*}{title=Before,coltitle=black,fonttitle=\sffamily}
+\documentclass{beamer}
+\end{dispListing*}
+\begin{dispListing*}{title=After,coltitle=black,fonttitle=\sffamily}
+\documentclass[beameroptions={}]{beamerswitch}
+\end{dispListing*}
+  \end{tcbraster}
 
-\item
-  If you did \emph{not} specify \key{ignorenonframetext} as one of your
-  \pkg{beamer} options, add a `\cs{mode}\texttt{<all>}' line directly after
-  `\cs{begin}\brackets{document}'.
+  If you only specified \key{ignorenonframetext}, then you don't
+  need \key{beameroptions}:
+
+  \begin{tcbraster}[raster equal height=rows]
+\begin{dispListing*}{title=Before,coltitle=black,fonttitle=\sffamily}
+\documentclass[ignorenonframetext]{beamer}
+\end{dispListing*}
+\begin{dispListing*}{title=After,coltitle=black,fonttitle=\sffamily}
+\documentclass {beamerswitch}
+\end{dispListing*}
+  \end{tcbraster}
 
 \item
   Wrap any preamble content intended only for your slides (like \cs{usetheme}
@@ -557,7 +578,7 @@ If you have an existing \pkg{beamer} presentation and want convert it to use
 
 In summary, here is an example:
 
-\begin{multicols}{2}
+\begin{tcbraster}[raster equal height=rows]
 \begin{dispListing*}{title=Before,coltitle=black,fonttitle=\sffamily}
 \documentclass[10pt]{beamer}
 
@@ -566,32 +587,28 @@ In summary, here is an example:
 
 \title{Test presentation}
 \begin{document}
-
   \maketitle
 \end{document}
 \end{dispListing*}
-  \columnbreak
 \begin{dispListing*}{title=After,coltitle=black,fonttitle=\sffamily}
-\PassOptionsToClass{10pt}{beamer}
-\documentclass{beamerswitch}
+\documentclass[beameroptions={10pt}]{beamerswitch}
 \mode<presentation>{%
   \usetheme{metropolis}
 }
 \title{Test presentation}
 \begin{document}
-\mode<all>
   \maketitle
 \end{document}
 \end{dispListing*}
-\end{multicols}
+\end{tcbraster}
 
 At this point the document should compile exactly as before.
 
 If you intend to use article mode at all, I strongly suggest that you
-proceed by converting your document body so it that works without the
-`\cs{mode}\texttt{<all>}' line. That means making sure all slide content is in
-a \env{frame} environment, new command definitions are moved to the preamble,
-and so on.
+proceed by converting your document body so it that works with \pkg{beamer}'s
+\val{ignorenonframetext} option in place. That means making sure all slide
+content is in a \env{frame} environment, new command definitions are moved
+to the preamble, and so on.
 
 Lastly, read through the rest of this manual and see what \pkg{beamerswitch} can
 do for you!
@@ -704,13 +721,27 @@ The class is loaded in the usual way:
 
 The various options are described below.
 
+\subsection{Passing options to the underlying classes}
+
+\begin{docKey}{articleoptions}{=\marg{options}}{default and initially empty}
+  Passes the \meta{options} to the \pkg{article} class when in \key{article}
+  mode.
+\end{docKey}
+
+\begin{docKey}{beameroptions}{=\marg{options}}{default and initially \val{ignorenonframetext}}
+  Passes the \meta{options} to the \pkg{beamer} class when in \key{beamer},
+  \key{handout} or \key{trans} mode. Do not specify \val{handout} or \val{trans}
+  among the options as \pkg{beamerswitch} handles those for you. Note that the
+  default behaviour is to pass the \val{ignorenonframetext} option, so remember
+  to include it yourself if you start specifying other options.
+\end{docKey}
+
+
 \subsection{Choosing the mode of the current run}
 
 The \pkg{beamerswitch} class, as explained above, does not do much itself but
 rather helps you to switch between \pkg{beamer} modes, specifically
-\key{article}, \key{beamer}, \key{trans} and \key{handout}. Note that it loads
-\pkg{beamer} with the \key{ignorenonframetext} option, so that text outside
-frames is only shown in \key{article} mode.
+\key{article}, \key{beamer}, \key{trans} and \key{handout}.
 
 The normal way of choosing the mode is to use the respective class options.
 
@@ -1175,7 +1206,8 @@ preamble.
 There are some other ways to customize the behaviour of the various modes.
 
 You can use the standard \LaTeX\ methods for customizing how the \pkg{article}
-and \pkg{beamer} classes are loaded:
+and \pkg{beamer} classes are loaded, if you don't like the class facilities for
+doing this:
 
 \begin{dispListing}
 \PassOptionsToClass{a4paper,11pt}{article} % for article mode
@@ -1334,6 +1366,26 @@ suggestions for improvements or new features to the
 % \end{optionkey}
 % \end{optionkey}
 %
+% \changes{v1.8}{2021/04/12}{Add \key{beameroptions} option.}
+% \begin{optionkey}{beameroptions}
+%
+% The \key{beameroptions} will passed to the \pkg{beamer} class.
+%
+%    \begin{macrocode}
+\define@cmdkey[DC]{beamerswitch}{beameroptions}[ignorenonframetext]{}
+%    \end{macrocode}
+% \end{optionkey}
+%
+% \changes{v1.8}{2021/04/12}{Add \key{articleoptions} option.}
+% \begin{optionkey}{articleoptions}
+%
+% The \key{articleoptions} will passed to the \pkg{article} class.
+%
+%    \begin{macrocode}
+\define@cmdkey[DC]{beamerswitch}{articleoptions}[]{}
+%    \end{macrocode}
+% \end{optionkey}
+%
 % \begin{optionkey}{nohyperref}
 % The \key{nohyperref} option stops the class from loading the \pkg{hyperref}
 % package in article mode.
@@ -1356,7 +1408,7 @@ suggestions for improvements or new features to the
 %
 %    \begin{macrocode}
 \setkeys[DC]{beamerswitch}{beamer=true,alsobeamer=false,alsotrans=false,%
-  alsohandout=false,alsoarticle=false}
+  alsohandout=false,alsoarticle=false,beameroptions,articleoptions}
 %    \end{macrocode}
 %
 % Now we process the options given by the user.
@@ -1489,6 +1541,7 @@ suggestions for improvements or new features to the
 %
 %    \begin{macrocode}
 \ifbool{DC@beamerswitch@article}{%
+  \PassOptionsToClass{\cmdDC@beamerswitch@articleoptions}{article}
   \LoadClass{article}
   \RequirePackage{beamerarticle}
   \def\beamer@insttitle#1{\textsuperscript{#1}}
@@ -1545,7 +1598,8 @@ suggestions for improvements or new features to the
 %
 %    \begin{macrocode}
   \ifbool{DC@beamerswitch@handout}{%
-    \LoadClass[ignorenonframetext,handout]{beamer}
+    \PassOptionsToClass{\cmdDC@beamerswitch@beameroptions}{beamer}
+    \LoadClass[handout]{beamer}
 %    \end{macrocode}
 %
 % Handout mode lays multiple slides out on a single page. For this we use
@@ -1560,9 +1614,11 @@ suggestions for improvements or new features to the
 %    \begin{macrocode}
   }{%
     \ifbool{DC@beamerswitch@trans}{%
-      \LoadClass[ignorenonframetext,trans]{beamer}
+      \PassOptionsToClass{\cmdDC@beamerswitch@beameroptions}{beamer}
+      \LoadClass[trans]{beamer}
     }{%
-      \LoadClass[ignorenonframetext]{beamer}
+      \PassOptionsToClass{\cmdDC@beamerswitch@beameroptions}{beamer}
+      \LoadClass{beamer}
     }%
   }
 }
