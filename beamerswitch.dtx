@@ -314,6 +314,7 @@ Copyright (C) 2016-2021 by Alex Ball <ab318@bath.ac.uk>
     }
   , documentation minted options=
     { breaklines
+    , fontsize=\small
     , breakbefore=\{\[
     , breakafter=/\}\]
     , breakbeforesymbolpre={}
@@ -538,14 +539,13 @@ If you have an existing \pkg{beamer} presentation and want convert it to use
 
   \begin{tcbraster}[raster equal height=rows]
 \begin{dispListing*}{title=Before,coltitle=black,fonttitle=\sffamily}
-\documentclass[10pt, xcolor={svgnames}]{beamer}
+\documentclass[10pt]{beamer}
 \end{dispListing*}
 \begin{dispListing*}{title=After,coltitle=black,fonttitle=\sffamily}
-\documentclass[beameroptions={10pt, xcolor={svgnames}}]{beamerswitch}
+\documentclass[beameroptions={10pt}]{beamerswitch}
 \end{dispListing*}
   \end{tcbraster}
 
-  \newpage
   If you didn't specify any options, then give \key{beameroptions} a blank
   value:
 
@@ -566,7 +566,7 @@ If you have an existing \pkg{beamer} presentation and want convert it to use
 \documentclass[ignorenonframetext]{beamer}
 \end{dispListing*}
 \begin{dispListing*}{title=After,coltitle=black,fonttitle=\sffamily}
-\documentclass {beamerswitch}
+\documentclass{beamerswitch}
 \end{dispListing*}
   \end{tcbraster}
 
@@ -606,7 +606,7 @@ At this point the document should compile exactly as before.
 
 If you intend to use article mode at all, I strongly suggest that you
 proceed by converting your document body so it that works with \pkg{beamer}'s
-\val{ignorenonframetext} option in place. That means making sure all slide
+\key{ignorenonframetext} option in place. That means making sure all slide
 content is in a \env{frame} environment, new command definitions are moved
 to the preamble, and so on.
 
@@ -886,8 +886,8 @@ If you want to switch to using \texttt{rubber}, say, pre-define
 \documentclass{beamerswitch}
 \end{dispListing}
 
-If you don't need the engine selection routine provided, simply pre-define
-\cs{BeamerswitchSpawn} to do whatever you need it to do:
+If you don't need the engine selection routine provided, you can replace it
+by pre-defining \cs{BeamerswitchSpawn} to do whatever you need it to do instead:
 
 \begin{dispListing}
 \newcommand*{\BeamerswitchSpawn}[1]{%
