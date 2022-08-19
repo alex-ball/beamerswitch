@@ -194,7 +194,7 @@ See:     http://www.latex-project.org/lppl.txt
 \endpreamble
 \postamble
 
-Copyright (C) 2016-2021 by Alex Ball <ab318@bath.ac.uk>
+Copyright (C) 2016-2022 by Alex Ball <ab318@bath.ac.uk>
 \endpostamble
 
 \usedir{tex/latex/\jobname}
@@ -229,7 +229,7 @@ Copyright (C) 2016-2021 by Alex Ball <ab318@bath.ac.uk>
 %<class>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<class>\ProvidesClass{beamerswitch}
 %<*class>
-    [2021/04/12 v1.8 Convenient mode selection in Beamer documents]
+    [2022/08/20 v1.9 Convenient mode selection in Beamer documents]
 %</class>
 %<*driver>
 \documentclass[12pt]{article}
@@ -723,9 +723,13 @@ The various options are described below.
 
 \subsection{Passing options to the underlying classes}
 
+\begin{docKey}{articleclass}{=\meta{class}}{default and initially \val{article}}
+  Selects the \meta{class} to use when in \key{article} mode.
+\end{docKey}
+
 \begin{docKey}{articleoptions}{=\marg{options}}{default and initially empty}
-  Passes the \meta{options} to the \pkg{article} class when in \key{article}
-  mode.
+  Passes the \meta{options} to the underlying class (selected by \key{articleclass})
+  when in \key{article} mode.
 \end{docKey}
 
 \begin{docKey}{beameroptions}{=\marg{options}}{default and initially \val{ignorenonframetext}}
@@ -1376,10 +1380,22 @@ suggestions for improvements or new features to the
 %    \end{macrocode}
 % \end{optionkey}
 %
+% \changes{v1.9}{2022/08/20}{Add \key{articleclass} option.}
+% \begin{optionkey}{articleclass}
+%
+% The \key{articleclass} option allows the class used for article mode
+% to be customized.
+%
+%    \begin{macrocode}
+\define@cmdkey[DC]{beamerswitch}{articleclass}[article]{}
+%    \end{macrocode}
+% \end{optionkey}
+%
 % \changes{v1.8}{2021/04/12}{Add \key{articleoptions} option.}
 % \begin{optionkey}{articleoptions}
 %
-% The \key{articleoptions} will passed to the \pkg{article} class.
+% The \key{articleoptions} will passed to the class used for
+% \key{article} mode.
 %
 %    \begin{macrocode}
 \define@cmdkey[DC]{beamerswitch}{articleoptions}[]{}
@@ -1409,7 +1425,8 @@ suggestions for improvements or new features to the
 %
 %    \begin{macrocode}
 \setkeys[DC]{beamerswitch}{beamer=true,alsobeamer=false,alsotrans=false,%
-  alsohandout=false,alsoarticle=false,beameroptions,articleoptions}
+  alsohandout=false,alsoarticle=false,beameroptions,articleclass,%
+  articleoptions}
 %    \end{macrocode}
 %
 % Now we process the options given by the user.
@@ -1530,9 +1547,8 @@ suggestions for improvements or new features to the
 %
 % \subsection{Setting up modes}
 %
-% For article mode, we load the \pkg{article} class and the \pkg{beamerarticle}
-% support package. Apologies for anyone hoping for \pkg{scrartcl} or
-% \pkg{memoir} alternatives.
+% For article mode, we load the class selected by the \key{articleclass}
+% option and the \pkg{beamerarticle} support package.
 % \begin{macro}{beamer@insttitle}
 % \begin{macro}{beamer@andtitle}
 % \begin{macro}{beamer@instinst}
@@ -1542,8 +1558,9 @@ suggestions for improvements or new features to the
 %
 %    \begin{macrocode}
 \ifbool{DC@beamerswitch@article}{%
-  \PassOptionsToClass{\cmdDC@beamerswitch@articleoptions}{article}
-  \LoadClass{article}
+  \PassOptionsToClass{\cmdDC@beamerswitch@articleoptions}{%
+    \cmdDC@beamerswitch@articleclass}
+  \LoadClass{\cmdDC@beamerswitch@articleclass}
   \RequirePackage{beamerarticle}
   \def\beamer@insttitle#1{\textsuperscript{#1}}
   \def\beamer@andtitle{\quad}
