@@ -1,6 +1,3 @@
-## Compiled zips
-beamerswitch-*.zip
-
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
@@ -96,3 +93,13 @@ sympy-plots-for-*.tex/
 
 # xindy
 *.xdy
+
+## Generated files
+beamerswitch-example*.pdf
+beamerswitch-example.tex
+beamerswitch.cls
+beamerswitch.ins
+beamerswitch.pdf
+
+# Compiled zips
+beamerswitch-*.zip
