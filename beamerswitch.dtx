@@ -1547,14 +1547,14 @@ suggestions for improvements or new features to the
 %
 % \subsection{Setting up modes}
 %
-% For article mode, we load the class selected by the \key{articleclass}
-% option and the \pkg{beamerarticle} support package.
 % \begin{macro}{beamer@insttitle}
 % \begin{macro}{beamer@andtitle}
 % \begin{macro}{beamer@instinst}
 % \begin{macro}{beamer@andinst}
+% For article mode, we load the class selected by the \key{articleclass}
+% option and require the \pkg{beamerarticle} support package.
 % We also add some beamer base macros that are needed for the
-%\cs{insertinstitute} command.
+% \cs{insertinstitute} command.
 %
 %    \begin{macrocode}
 \ifbool{DC@beamerswitch@article}{%
@@ -1609,27 +1609,17 @@ suggestions for improvements or new features to the
 }{%
 %    \end{macrocode}
 %
-%
-% For the presentation modes, we load the \pkg{beamer} class with appropriate
-% options. Since we are targeting users wanting different versions of their
-% presentations with the same code, we activate \key{ignorenonframetext}.
-%
-%    \begin{macrocode}
-  \ifbool{DC@beamerswitch@handout}{%
-    \PassOptionsToClass{\cmdDC@beamerswitch@beameroptions}{beamer}
-    \LoadClass[handout]{beamer}
-%    \end{macrocode}
+% For the presentation modes, we load the \pkg{beamer} class with the
+% appropriate mode option as well those chosen using \key{beameroptions}.
 %
 % Handout mode lays multiple slides out on a single page. For this we use
 % \pkg{pgfpages}. The actual configuration is handled later.
 %
 %    \begin{macrocode}
+  \ifbool{DC@beamerswitch@handout}{%
+    \PassOptionsToClass{\cmdDC@beamerswitch@beameroptions}{beamer}
+    \LoadClass[handout]{beamer}
     \RequirePackage{pgfpages}
-%    \end{macrocode}
-%
-% We also activate \key{ignorenonframetext} for the other two modes.
-%
-%    \begin{macrocode}
   }{%
     \ifbool{DC@beamerswitch@trans}{%
       \PassOptionsToClass{\cmdDC@beamerswitch@beameroptions}{beamer}
