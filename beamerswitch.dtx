@@ -886,6 +886,7 @@ If you want to switch to using \texttt{rubber}, say, pre-define
 \begin{dispListing}
 \newcommand*{\SpawnedCompiler}{rubber -q --synctex}
 \newcommand*{\SpawnedPDFTeX}{\SpawnedCompiler -m pdftex}
+\newcommand*{\SpawnedLuaTeX}{\SpawnedCompiler -m lualatex} % needs v1.6.0+
 \newcommand*{\SpawnedXeTeX}{\SpawnedCompiler -m xelatex}
 \documentclass{beamerswitch}
 \end{dispListing}
@@ -1270,10 +1271,12 @@ suggestions for improvements or new features to the
 %   \pkg{shellesc} for running parallel compilations
 % \item
 %   \pkg{iftex} for determining which engine to use
+% \item
+%   \pkg{expl3} for cleaning options passed onward to underlying classes.
 % \end{itemize}
 %
 %    \begin{macrocode}
-\RequirePackage{xkeyval,xkvltxp,etoolbox,xstring,shellesc,iftex}
+\RequirePackage{xkeyval,xkvltxp,etoolbox,xstring,shellesc,iftex,expl3}
 %    \end{macrocode}
 %
 % \subsection{Class options}
@@ -1433,6 +1436,16 @@ suggestions for improvements or new features to the
 %
 %    \begin{macrocode}
 \ProcessOptionsX[DC]<beamerswitch>
+%    \end{macrocode}
+%
+% We remove problematic whitespace from \key{articleoptions} and
+% \key{beameroptions}.
+%
+%    \begin{macrocode}
+\ExplSyntaxOn
+\tl_replace_all:Nnn \cmdDC@beamerswitch@articleoptions { ,~ } { , }
+\tl_replace_all:Nnn \cmdDC@beamerswitch@beameroptions { ,~ } { , }
+\ExplSyntaxOff
 %    \end{macrocode}
 %
 % \subsection{Jobname-based mode switching}\label{sec:switching}
