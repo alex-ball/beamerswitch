@@ -226,7 +226,7 @@ Copyright (C) 2016-2022 by Alex Ball <ab318@bath.ac.uk>
 %<*driver>
 \ProvidesFile{beamerswitch.dtx}
 %</driver>
-%<class>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
+%<class>\NeedsTeXFormat{LaTeX2e}[2020/10/01]
 %<class>\ProvidesClass{beamerswitch}
 %<*class>
     [2022/08/20 v1.9 Convenient mode selection in Beamer documents]
@@ -699,7 +699,6 @@ distributions.
   \begin{itemize}
     \item \pkg{beamer}
     \item \pkg{etoolbox}
-    \item \pkg{expl3}
     \item \pkg{hyperref}
     \item \pkg{iftex}
     \item \pkg{pgf}
@@ -1189,11 +1188,9 @@ preamble.
     authors to their affiliations.
   \end{itemize}
 
-  If you have \pkg{xparse} (and hence \pkg{expl3}) installed, the class will
-  detect cases where your title ends in a character like `?' and will not add a
-  colon to it in that case. You can also suppress the colon manually with the
-  following code (add it \emph{after} using \cs{title} if automatic detection is
-  in effect):
+  The class will detect cases where your title ends in a character like `?'
+  and will not add a colon to it in that case. You can also suppress the colon
+  manually with the following code (add it \emph{after} using \cs{title}):
 
 \begin{dispListing}
 \toggletrue{titlepunct}
@@ -1272,12 +1269,10 @@ suggestions for improvements or new features to the
 %   \pkg{shellesc} for running parallel compilations
 % \item
 %   \pkg{iftex} for determining which engine to use
-% \item
-%   \pkg{expl3} for cleaning options passed onward to underlying classes.
 % \end{itemize}
 %
 %    \begin{macrocode}
-\RequirePackage{xkeyval,xkvltxp,etoolbox,xstring,shellesc,iftex,expl3}
+\RequirePackage{xkeyval,xkvltxp,etoolbox,xstring,shellesc,iftex}
 %    \end{macrocode}
 %
 % \subsection{Class options}
@@ -2933,53 +2928,42 @@ suggestions for improvements or new features to the
 % \changes{v1.6.1}{2020/01/20}{Update expl3 syntax.}
 % Of course, we would rather not bother the user with this, so we introduce a
 % command for testing the title for final punctuation.
-%
-% The only way I can seem to do this is by switching to \pkg{expl3} syntax.
-% Rather than introduce extra hard dependencies to cope with what will probably
-% be quite a rare issue, we make the dependency soft: it will only be applied
-% if \pkg{xparse} is available. If there is demand for it, we could introduce
-% a class option to switch this code on or off, but let's see how we go.
+% For this, we need \pkg{expl3} syntax.
 %
 %    \begin{macrocode}
-\IfFileExists{xparse.sty}{\@tempswatrue}{\@tempswafalse}
-\if@tempswa
-  \RequirePackage{xparse}
-  \ExplSyntaxOn
-  \NewDocumentCommand{\bsw@punct@test}{m}{\l_bsw_punct_test:n {#1}}
-  \cs_new_protected:Nn \l_bsw_punct_test:n
-  {
-    \str_case_e:nnTF { \str_item:nn {#1} {-1} }
-      {
-        { , } { }
-        { ; } { }
-        { : } { }
-        { . } { }
-        { ! } { }
-        { ? } { }
-      }
-      { \global\toggletrue{titlepunct} }
-      { \global\togglefalse{titlepunct} }
-  }
-  \ExplSyntaxOff
+\ExplSyntaxOn
+\NewDocumentCommand{\bsw@punct@test}{m}{\l_bsw_punct_test:n {#1}}
+\cs_new_protected:Nn \l_bsw_punct_test:n
+{
+  \str_case_e:nnTF { \str_item:nn {#1} {-1} }
+    {
+      { , } { }
+      { ; } { }
+      { : } { }
+      { . } { }
+      { ! } { }
+      { ? } { }
+    }
+    { \global\toggletrue{titlepunct} }
+    { \global\togglefalse{titlepunct} }
+}
+\ExplSyntaxOff
 %    \end{macrocode}
 %
 % We insert this test into the definitions for \cs{title} introduced by
 % \pkg{beamer}\slash\pkg{beamerarticle}.
 %
 %    \begin{macrocode}
-  \mode<article>{%
-    \renewcommand{\title}[2][]{\beamer@origtitle{#2}\bsw@punct@test{#2}}
+\mode<article>{%
+  \renewcommand{\title}[2][]{\beamer@origtitle{#2}\bsw@punct@test{#2}}
+}
+\mode<presentation>{%
+  \long\def\beamer@title[#1]#2{%
+    \def\inserttitle{#2}%
+    \def\beamer@shorttitle{#1}%
+    \bsw@punct@test{#2}%
   }
-  \mode<presentation>{%
-    \long\def\beamer@title[#1]#2{%
-      \def\inserttitle{#2}%
-      \def\beamer@shorttitle{#1}%
-      \bsw@punct@test{#2}%
-    }
-  }
-\else
-  \wlog{Beamerswitch: Auto-detection of title punctuation not available.}
-\fi
+}
 %    \end{macrocode}
 % \end{macro}
 %
